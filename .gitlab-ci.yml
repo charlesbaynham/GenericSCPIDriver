@@ -132,9 +132,7 @@ tox_slowtests:
 
 # Upload the documentation to pages if it's a tagged commit
 pages:
-  image:
-    name: sphinxdoc/sphinx
-    entrypoint: ['']
+  extends: .py_venv
   stage: Publish Pages
   needs: []
   script:
@@ -149,13 +147,12 @@ pages:
       when: always
   
 pdf_make:  
-  image:
-    name: sphinxdoc/sphinx
-    entrypoint: ['']
+  extends: .py_venv
   stage: Build Documentation
   needs: []
   script:
     - sphinx-build docs latex -b latex
+  
   artifacts:
     paths:
     - latex
