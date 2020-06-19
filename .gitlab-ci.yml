@@ -162,12 +162,13 @@ pdf_compile:
   image:  charlesbaynham/ctanfull
   artifacts:
     paths:
-    - latex/generic_scpi_driver.pdf
+    - generic_scpi_driver.pdf
     expose_as: "Manual"
     name: ${CI_COMMIT_REF_SLUG}_manual.pdf
   script:
     - cd latex
     - make
+    - cp generic_scpi_driver.pdf ../generic_scpi_driver.pdf
 
 # Copied contents of Gitlab's Code-Quality.gitlab-ci.yml so I can edit the rules
 
