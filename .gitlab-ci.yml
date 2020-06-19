@@ -159,7 +159,7 @@ pdf_make:
 pdf_compile:
   needs: ["pdf_make"]
   stage: Publish Documentation
-  image:  charlesbaynham/latex-docker
+  image:  charlesbaynham/ctanfull
   artifacts:
     paths:
     - latex/generic_scpi_driver.pdf
