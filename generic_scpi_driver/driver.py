@@ -138,7 +138,7 @@ class GenericDriver:
         cls._simulator_factory = simulator_factory
 
     Arg = namedtuple("Arg", ["name", "default", "validator"])
-    Arg.__new__.__defaults__ = (None, None)
+    Arg.__new__.__defaults__ = (None, None)  # type: ignore
 
     @classmethod
     def register_query(
