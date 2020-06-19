@@ -1,0 +1,2 @@
+include versioneer.py
+include generic_scpi_driver/_version.py
