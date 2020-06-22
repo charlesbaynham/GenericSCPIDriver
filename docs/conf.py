@@ -23,7 +23,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath(".."))
 
-project_title = "{{cookiecutter.package_name}}".replace("_", " ").title()
+project_title = "generic_scpi_driver".replace("_", " ").title()
 
 # -- General configuration ---------------------------------------------
 
