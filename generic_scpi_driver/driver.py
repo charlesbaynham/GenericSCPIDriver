@@ -15,6 +15,7 @@ from typing import Callable, List, Tuple
 import pyvisa
 
 _locks = {}
+_visa_sessions = {}
 
 
 def with_lock(f):
@@ -106,20 +107,36 @@ class GenericDriver:
         if id not in _locks:
             _locks[id] = RLock()
 
-        # Claim this device
+        # Claim this device exclusivly while we manipulate it
         with _locks[id]:
-            logging.debug("Accessing controller {} with locks {}".format(id, _locks))
+            self.dev_id = self.__class__ + id
+            if simulation:
+                self.dev_id += "Sim"
+
+            logging.debug("Accessing controller {} with locks {}".format(self.dev_id, _locks))
 
             if simulation:
                 if not self.__class__._simulator_factory:
                     raise RuntimeError(
                         "Simulation mode is not available: you must first call register_simulator"
                     )
-                self.instr = self.__class__._simulator_factory()
+                if self.dev_id not in _visa_sessions:
+                    _visa_sessions[self.dev_id] = self.__class__._simulator_factory()
             else:
-                self.instr = self._setup_device(id, baud_rate=baud_rate)
+                if self.dev_id not in _visa_sessions:
+                    _visa_sessions[self.dev_id] = self._setup_device(id, baud_rate=baud_rate)
 
         self.check_connection()
+
+    @property('instr')
+    def get_instr(self):
+        '''
+        Get the VISA session for this device.
+
+        This is stored in a shared namespace for this python session,
+        so other GenericDrivers can access the same device in a thread-safe way, taking turns via @with_lock.
+        '''
+        return _visa_sessions[self.dev_id]
 
     @classmethod
     def register_simulator(cls, simulator_factory):
