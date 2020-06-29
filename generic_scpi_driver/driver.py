@@ -128,8 +128,8 @@ class GenericDriver:
 
         self.check_connection()
 
-    @property('instr')
-    def get_instr(self):
+    @property
+    def instr(self):
         '''
         Get the VISA session for this device.
 
