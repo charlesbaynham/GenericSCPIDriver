@@ -162,7 +162,7 @@ def test_command_args():
     class Driver(GenericDriver):
         pass
 
-    Driver.register_query("get_mode", "MODE?", args=[("channel", None, None)])
+    Driver.register_query("get_mode", "MODE?", args=[("channel", None)])
 
     # Register a simulator
     sim = Mock(unsafe=True)
@@ -183,7 +183,7 @@ def test_command_args_default():
     class Driver(GenericDriver):
         pass
 
-    Driver.register_query("get_mode", "MODE?", args=[("channel", "1", None)])
+    Driver.register_query("get_mode", "MODE?", args=[("channel", "1")])
 
     # Register a simulator
     sim = Mock(unsafe=True)
@@ -204,7 +204,7 @@ def test_command_args_default_multiple():
     Driver.register_query(
         "get_mode",
         "MODE?",
-        args=[("a", None, None), ("b", "second_arg_default", None),],
+        args=[("a", None), ("b", "second_arg_default")],
     )
 
     # Register a simulator
@@ -235,7 +235,7 @@ def test_command_args_keywords():
     Driver.register_query(
         "get_mode",
         "MODE?",
-        args=[("a", None, None), ("b", "second_arg_default", None),],
+        args=[("a", None), ("b", "second_arg_default")],
     )
 
     # Register a simulator
@@ -280,5 +280,5 @@ def test_command_args_backwards():
         Driver.register_query(
             "get_mode",
             "MODE?",
-            args=[("b", "second_arg_default", None), ("a", None, None),],
+            args=[("b", "second_arg_default"), ("a", None), ],
         )

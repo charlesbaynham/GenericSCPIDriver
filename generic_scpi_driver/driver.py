@@ -155,7 +155,7 @@ class GenericDriver:
         cls._simulator_factory = simulator_factory
 
     Arg = namedtuple("Arg", ["name", "default", "validator"])
-    Arg.__new__.__defaults__ = (None, None)  # type: ignore
+    Arg.__new__.__defaults__ = (None, str)  # type: ignore
 
     @classmethod
     def register_query(
@@ -176,10 +176,7 @@ class GenericDriver:
         def func(self, *args):
             arg_strings = []
             for arg, registered_arg in zip(args, registered_args):
-                if registered_arg.validator:
-                    arg_strings.append(registered_arg.validator(arg))
-                else:
-                    arg_strings.append(str(arg))
+                arg_strings.append(registered_arg.validator(arg))
 
             cmd_string = " ".join([device_command] + arg_strings)
 
