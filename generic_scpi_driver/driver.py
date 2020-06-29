@@ -183,14 +183,17 @@ class GenericDriver:
 
             cmd_string = " ".join([device_command] + arg_strings)
 
-            r = self.instr.query(cmd_string)
+            if response_parser:
+                r = self.instr.query(cmd_string)
 
-            # Validate the response if available
-            if response_validator:
-                response_validator(r)
+                # Validate the response if available
+                if response_validator:
+                    response_validator(r)
 
-            # Return the parsed result
-            return response_parser(r)
+                # Return the parsed result
+                return response_parser(r)
+            else:
+                self.instr.write(cmd_string)
 
         # Build a python function which takes the arguments as named. This is useful because now our bound methods
         # are real python methods, and so can respond to e.g.
