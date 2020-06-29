@@ -78,7 +78,7 @@ class GenericDriver:
 
     _simulator_factory = None
 
-    def __init__(self, *args, id=None, simulation=False, baud_rate=57600):
+    def __init__(self, *args, id=None, simulation=False, baud_rate=57600, **kwargs):
         """Make a new device driver
 
         If your child class also has an init function, don't forget to call
@@ -124,7 +124,8 @@ class GenericDriver:
                     _visa_sessions[self.dev_id] = self.__class__._simulator_factory()
             else:
                 if self.dev_id not in _visa_sessions:
-                    _visa_sessions[self.dev_id] = self._setup_device(id, baud_rate=baud_rate)
+                    # Pass all unrecognised keyword arguments to _setup_device
+                    _visa_sessions[self.dev_id] = self._setup_device(id, baud_rate=baud_rate, **kwargs)
 
         self.check_connection()
 
@@ -263,7 +264,7 @@ and expects you to pass it {} arguments named {}.
         pass
 
     @staticmethod
-    def _setup_device(id, baud_rate):
+    def _setup_device(id, baud_rate, read_termination='\n', write_termination='\n', timeout=None):
         """Open a visa connection to the device
 
         Raises:
@@ -280,8 +281,12 @@ and expects you to pass it {} arguments named {}.
 
         # Configure the connection as required
         instr.baud_rate = baud_rate
-        # instr.read_termination = '\r\n'
-        # instr.write_termination = '\n'
+        if read_termination:
+            instr.read_termination = read_termination
+        if write_termination:
+            instr.write_termination = write_termination
+        if timeout:
+            instr.timeout = timeout
         # instr.data_bits = 8
         # instr.stop_bits = visa.constants.StopBits.one
         # instr.parity = visa.constants.Parity.none
