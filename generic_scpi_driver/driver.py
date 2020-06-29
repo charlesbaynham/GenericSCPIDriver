@@ -10,7 +10,7 @@ from collections import namedtuple
 from functools import wraps
 from threading import RLock
 from types import FunctionType
-from typing import Callable, List, Tuple
+# from typing import Callable, List, Tuple
 
 import pyvisa
 
@@ -162,9 +162,9 @@ class GenericDriver:
         cls,
         method_name: str,
         device_command: str,
-        response_parser: Callable = str,
-        response_validator: Callable = None,
-        args: List[Tuple] = [],
+        response_parser=str,
+        response_validator=None,
+        args=[],
     ):
         registered_args = [GenericDriver.Arg(*a) for a in args]
 
