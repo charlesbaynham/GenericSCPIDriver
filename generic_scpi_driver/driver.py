@@ -150,7 +150,7 @@ class GenericDriver:
         Args:
             simulator_factory (Callable): Function to generate a simulator object
         """
-        if not isinstance(simulator_factory, Callable):
+        if not callable(simulator_factory):
             raise ValueError("Expected a callable for simulator_factory")
         cls._simulator_factory = simulator_factory
 
