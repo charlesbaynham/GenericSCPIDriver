@@ -109,7 +109,7 @@ class GenericDriver:
 
         # Claim this device exclusivly while we manipulate it
         with _locks[id]:
-            self.dev_id = self.__class__ + id
+            self.dev_id = str(self.__class__) + id
             if simulation:
                 self.dev_id += "Sim"
 
