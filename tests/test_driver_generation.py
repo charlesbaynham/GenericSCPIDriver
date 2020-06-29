@@ -282,3 +282,25 @@ def test_command_args_backwards():
             "MODE?",
             args=[("b", "second_arg_default"), ("a", None), ],
         )
+
+
+def test_command_args_validators():
+    class Driver(GenericDriver):
+        pass
+
+    Driver.register_query(
+        "get_mode",
+        "MODE?",
+        args=[("a", None, lambda num: "{:.1f}".format(num))],
+    )
+
+    # Register a simulator
+    sim = Mock(unsafe=True)
+    sim.query = Mock()
+
+    Driver.register_simulator(lambda: sim)
+
+    d = Driver(id="something", simulation=True)
+
+    d.get_mode(a=1.123)
+    sim.query.assert_called_with("MODE? 1.1")
