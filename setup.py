@@ -4,6 +4,7 @@ import re
 
 from setuptools import find_packages
 from setuptools import setup
+
 import versioneer
 
 
@@ -25,7 +26,7 @@ setup(
     description="A generic template for creating python object-based drivers for SCPI hardware devices which communicate via VISA. Compatible with ARTIQ. ",
     long_description=read("README.rst"),
     packages=find_packages(exclude=("tests",)),
-    install_requires=["pyvisa"],
+    install_requires=["pyvisa", "pyserial"],
     extras_require={"dev": ["pre-commit", "tox", "sphinx", "sphinx_rtd_theme"]},
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",

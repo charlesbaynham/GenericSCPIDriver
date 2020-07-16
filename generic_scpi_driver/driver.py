@@ -10,12 +10,65 @@ from collections import namedtuple
 from functools import wraps
 from threading import RLock
 from types import FunctionType
-# from typing import Callable, List, Tuple
 
 import pyvisa
+from serial.tools.list_ports import grep as grep_serial_ports
+
+# from typing import Callable, List, Tuple
 
 _locks = {}
 _visa_sessions = {}
+
+
+def get_hwid_from_com_port(com_port):
+    """Get a uniquely identifying HWID from a device attached to a COM port
+
+    The HWID of a device is (/ should be) a unique string that identifies it. Unlike the COM port,
+    this string is intrinsic to the device and will never change. Referring to devices by these
+    strings is therefore a robust way of doing things. 
+
+    Args:
+        com_port (str): COM port e.g. "COM11"
+
+    Raises:
+        RuntimeError: Raised if the device is not found or multiple matches are found
+
+    Returns:
+        str: HWID of the device on the given COM port
+    """
+    matches = list(grep_serial_ports(com_port))
+    if not matches:
+        raise RuntimeError("Device {} not found".format(com_port))
+    if len(matches) > 1:
+        raise RuntimeError("Multiple matched for device {}".format(com_port))
+    return matches[0].hwid
+
+
+def get_com_port_by_hwid(hwid):
+    """Get the current COM port based on a uniquely identifying hardware ID of a device
+
+    The HWID of a device is (/ should be) a unique string that identifies it. Unlike the COM port,
+    this string is intrinsic to the device and will never change. Referring to devices by these
+    strings is therefore a robust way of doing things. 
+
+    Args:
+        hwid (str): Hardware ID string to match, e.g. 'USB VID:PID=0403:6001 SER=A6003SX4A'.
+                    This is matched using serial.tools.list_ports.grep so can be less specific
+                    if desired. The search should result in a single match otherwise an exception will
+                    be raised. 
+
+    Raises:
+        RuntimeError: Raised if the device is not found or multiple matches are found
+
+    Returns:
+        str: current port of the device (e.g. "COM11")
+    """
+    matches = list(grep_serial_ports(hwid))
+    if not matches:
+        raise RuntimeError("Device {} not found".format(hwid))
+    if len(matches) > 1:
+        raise RuntimeError("Multiple matched for device {}".format(hwid))
+    return matches[0].device
 
 
 def with_lock(f):
@@ -93,27 +146,38 @@ class GenericDriver:
         it can be used with ARTIQ which passes the device manager into new
         driver constructors.
         """
-        logging.debug("Creating new driver object for device {}".format(id))
+        logging.debug("Creating new driver object for device %s", id)
 
         # ID of the device that this driver controls
         if not id:
             raise ValueError("You must pass an id")
-        self.id = id
+        try:
+            self.id = get_com_port_by_hwid(id)
+        except RuntimeError as e:
+            if simulation:
+                # Simulation mode, so don't worry about a missing device
+                self.id = id
+            else:
+                raise e
+
+        logging.debug("Found device %s on COM port %s", id, self.id)
 
         # Create a Lock for this resource if it doesn't already exist. This lives
         # in the namespace of this module and so is common across all Drivers,
         # just in case you make multiple drivers pointing to the same device for
         # some reason
-        if id not in _locks:
-            _locks[id] = RLock()
+        if self.id not in _locks:
+            _locks[self.id] = RLock()
 
         # Claim this device exclusivly while we manipulate it
-        with _locks[id]:
-            self.dev_id = str(self.__class__) + id
+        with _locks[self.id]:
+            self.dev_id = str(self.__class__) + self.id
             if simulation:
                 self.dev_id += "Sim"
 
-            logging.debug("Accessing controller {} with locks {}".format(self.dev_id, _locks))
+            logging.debug(
+                "Accessing controller {} with locks {}".format(self.dev_id, _locks)
+            )
 
             if simulation:
                 if not self.__class__._simulator_factory:
@@ -125,18 +189,20 @@ class GenericDriver:
             else:
                 if self.dev_id not in _visa_sessions:
                     # Pass all unrecognised keyword arguments to _setup_device
-                    _visa_sessions[self.dev_id] = self._setup_device(id, baud_rate=baud_rate, **kwargs)
+                    _visa_sessions[self.dev_id] = self._setup_device(
+                        self.id, baud_rate=baud_rate, **kwargs
+                    )
 
         self.check_connection()
 
     @property
     def instr(self):
-        '''
+        """
         Get the VISA session for this device.
 
         This is stored in a shared namespace for this python session,
         so other GenericDrivers can access the same device in a thread-safe way, taking turns via @with_lock.
-        '''
+        """
         return _visa_sessions[self.dev_id]
 
     @classmethod
@@ -264,7 +330,9 @@ and expects you to pass it {} arguments named {}.
         pass
 
     @staticmethod
-    def _setup_device(id, baud_rate, read_termination='\n', write_termination='\n', timeout=None):
+    def _setup_device(
+        id, baud_rate, read_termination="\n", write_termination="\n", timeout=None
+    ):
         """Open a visa connection to the device
 
         Raises:

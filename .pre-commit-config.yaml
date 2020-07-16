@@ -1,5 +1,15 @@
+
 repos:
+  # Sort python imports
+  - repo: https://github.com/asottile/reorder_python_imports
+    rev: v2.3.0
+    hooks:
+    - id: reorder-python-imports
+      language_version: python3.8
+    
+  # Format the code with a conventional PEP8 style
   - repo: https://github.com/psf/black
     rev: stable
     hooks:
       - id: black
+        language_version: python3.8
