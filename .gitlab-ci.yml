@@ -1,5 +1,5 @@
-# # Default image, if not specified
-# image: "python:3.8"
+# Default image, if not specified
+image: "python:3.8"
 
 stages:
 #   - Build Documentation
