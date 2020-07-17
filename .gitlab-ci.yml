@@ -3,10 +3,10 @@ image: "python:3.8"
 
 stages:
   - Build Documentation
-  - Publish Documentation
+  - Compile Documentation
   - Static Analysis
   - Test
-  - Full test
+  - Build Release
   - Publish Pages
 
 ### Setup cache ###
@@ -104,7 +104,7 @@ tox-3.8:
   
 tox_slowtests:
     extends: .py_venv
-    stage: "Full test"
+    stage: "Test"
     rules:
       # Run for scheduled or triggered builds
       - if: '$CI_PIPELINE_SOURCE == "trigger"'
@@ -127,6 +127,21 @@ tox_slowtests:
       - tox -- --runslow
     coverage: '/^TOTAL.+?(\d+\%)$/'
     needs: []
+
+### Build for release ###
+build:
+  stage: Build Release
+  script:
+    - python setup.py sdist
+    - mv dist/*.tar.gz build.tar.gz
+  artifacts:
+    paths:
+    - build.tar.gz
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: always
 
 ### Documentation ###
 
@@ -160,7 +175,7 @@ pdf_make:
     
 pdf_compile:
   needs: ["pdf_make"]
-  stage: Publish Documentation
+  stage: Compile Documentation
   image:  charlesbaynham/ctanfull
   artifacts:
     paths:
