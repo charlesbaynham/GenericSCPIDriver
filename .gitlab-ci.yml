@@ -2,133 +2,133 @@
 image: "python:3.8"
 
 stages:
-#   - Build Documentation
-#   - Compile Documentation
-#   - Static Analysis
-#   - Test
+  - Build Documentation
+  - Compile Documentation
+  - Static Analysis
+  - Test
   - Build Release
-#   - Publish Pages
+  - Publish Pages
 
-# ### Setup cache ###
-# # See https://docs.gitlab.com/ee/ci/caching/index.html
-# #
-# # Change pip's cache directory to be inside the project directory since we can
-# # only cache local items.
-# variables:
-#   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+### Setup cache ###
+# See https://docs.gitlab.com/ee/ci/caching/index.html
+#
+# Change pip's cache directory to be inside the project directory since we can
+# only cache local items.
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
 
-# # Pip's cache doesn't store the python packages
-# # https://pip.pypa.io/en/stable/reference/pip_install/#caching
-# #
-# # If you want to also cache the installed packages, you have to install
-# # them in a virtualenv and cache it as well.
-# cache:
-#   key: ${CI_JOB_NAME}
-#   paths:
-#     - .cache/pip
-#     - .tox/
-#     - venv/
+# Pip's cache doesn't store the python packages
+# https://pip.pypa.io/en/stable/reference/pip_install/#caching
+#
+# If you want to also cache the installed packages, you have to install
+# them in a virtualenv and cache it as well.
+cache:
+  key: ${CI_JOB_NAME}
+  paths:
+    - .cache/pip
+    - .tox/
+    - venv/
 
-# # Make a template for steps that use a python virtual env
-# .py_venv:
-#   before_script:
-#     # Store the CI_JOB_TOKEN so that jobs can access other repositories with the access rights of the triggering user:
-#     - echo -e "machine gitlab.npl.co.uk\nlogin gitlab-ci-token\npassword ${CI_JOB_TOKEN}" > ~/.netrc
-#     # Debug output
-#     - ls -la
-#     - pwd
-#     - python -c "import sys;print(sys.path)"
-#     - python --version
-#     # Set up git for test commits
-#     - git config --global user.name "Gitlabs CI Testing"
-#     - git config --global user.email "test@example.com"
-#     # Make a virtual environment to install deps into (this will be cached for each step)
-#     - python --version
-#     - pip install virtualenv
-#     - virtualenv venv
-#     - source venv/bin/activate
-#     - pip install .[dev]
+# Make a template for steps that use a python virtual env
+.py_venv:
+  before_script:
+    # Store the CI_JOB_TOKEN so that jobs can access other repositories with the access rights of the triggering user:
+    - echo -e "machine gitlab.npl.co.uk\nlogin gitlab-ci-token\npassword ${CI_JOB_TOKEN}" > ~/.netrc
+    # Debug output
+    - ls -la
+    - pwd
+    - python -c "import sys;print(sys.path)"
+    - python --version
+    # Set up git for test commits
+    - git config --global user.name "Gitlabs CI Testing"
+    - git config --global user.email "test@example.com"
+    # Make a virtual environment to install deps into (this will be cached for each step)
+    - python --version
+    - pip install virtualenv
+    - virtualenv venv
+    - source venv/bin/activate
+    - pip install .[dev]
 
-# ### Linting ###
+### Linting ###
 
-# black:
-#   image: 
-#     name: cytopia/black
-#     entrypoint: [""]
-#   stage: Static Analysis
-#   script:
-#     - black --check generic_scpi_driver
-#   allow_failure: true
-#   needs: []
-
-
-# mypy:
-#   image:
-#     name: grktsh/mypy
-#     entrypoint: [""]
-#   stage: Static Analysis
-#   script:
-#     - mypy generic_scpi_driver
-#   allow_failure: true
-#   needs: []
+black:
+  image: 
+    name: cytopia/black
+    entrypoint: [""]
+  stage: Static Analysis
+  script:
+    - black --check generic_scpi_driver
+  allow_failure: true
+  needs: []
 
 
-# ### Tests ###
+mypy:
+  image:
+    name: grktsh/mypy
+    entrypoint: [""]
+  stage: Static Analysis
+  script:
+    - mypy generic_scpi_driver
+  allow_failure: true
+  needs: []
 
-# .tox:
-#   extends: .py_venv
-#   script:
-#     - pwd
-#     - ls -l
-#     - export PYTHONPATH="$PYTHONPATH:."
-#     - python -c "import sys;print(sys.path)"
-#     - pip install tox
-#     - tox
-#   coverage: '/^TOTAL.+?(\d+\%)$/'
-#   needs: []
 
-# tox-3.6:
-#     extends: ".tox"
-#     stage: "Test"
-#     image: "python:3.6"
+### Tests ###
 
-# tox-3.7:
-#     extends: ".tox"
-#     stage: "Test"
-#     image: "python:3.7"
+.tox:
+  extends: .py_venv
+  script:
+    - pwd
+    - ls -l
+    - export PYTHONPATH="$PYTHONPATH:."
+    - python -c "import sys;print(sys.path)"
+    - pip install tox
+    - tox
+  coverage: '/^TOTAL.+?(\d+\%)$/'
+  needs: []
 
-# tox-3.8:
-#     extends: ".tox"
-#     stage: "Test"
-#     image: "python:3.8"
+tox-3.6:
+    extends: ".tox"
+    stage: "Test"
+    image: "python:3.6"
+
+tox-3.7:
+    extends: ".tox"
+    stage: "Test"
+    image: "python:3.7"
+
+tox-3.8:
+    extends: ".tox"
+    stage: "Test"
+    image: "python:3.8"
   
-# tox_slowtests:
-#     extends: .py_venv
-#     stage: "Test"
-#     rules:
-#       # Run for scheduled or triggered builds
-#       - if: '$CI_PIPELINE_SOURCE == "trigger"'
-#         when: always
-#       - if: '$CI_PIPELINE_SOURCE == "schedule"'
-#         when: always        
-#       # Run for tags
-#       - if: '$CI_COMMIT_TAG'
-#         when: always
-#       # And allow manual runs
-#       - if: '$CI_COMMIT_BRANCH'
-#         when: manual
-#         allow_failure: true
-#     script:
-#       - pwd
-#       - ls -l
-#       - export PYTHONPATH="$PYTHONPATH:."
-#       - python -c "import sys;print(sys.path)"
-#       - pip install tox
-#       - tox -- --runslow
-#     coverage: '/^TOTAL.+?(\d+\%)$/'
-#     needs: []
+tox_slowtests:
+    extends: .py_venv
+    stage: "Test"
+    rules:
+      # Run for scheduled or triggered builds
+      - if: '$CI_PIPELINE_SOURCE == "trigger"'
+        when: always
+      - if: '$CI_PIPELINE_SOURCE == "schedule"'
+        when: always        
+      # Run for tags
+      - if: '$CI_COMMIT_TAG'
+        when: always
+      # And allow manual runs
+      - if: '$CI_COMMIT_BRANCH'
+        when: manual
+        allow_failure: true
+    script:
+      - pwd
+      - ls -l
+      - export PYTHONPATH="$PYTHONPATH:."
+      - python -c "import sys;print(sys.path)"
+      - pip install tox
+      - tox -- --runslow
+    coverage: '/^TOTAL.+?(\d+\%)$/'
+    needs: []
 
-### Build for release ###
+### Build for release if it's tagged ###
 build:
   stage: Build Release
   script:
@@ -137,86 +137,86 @@ build:
   artifacts:
     paths:
     - build.tar.gz
-  # rules:
-  #   - if: '$CI_COMMIT_TAG'
-  #     when: always
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: always
 
-# ### Documentation ###
+### Documentation ###
 
-# # Upload the documentation to pages if it's a tagged commit
-# pages:
-#   extends: .py_venv
-#   stage: Publish Pages
-#   needs: []
-#   script:
-#     - sphinx-build docs public -b html
-#   artifacts:
-#     paths:
-#     - public
-#   rules:
-#     - if: '$CI_COMMIT_TAG'
-#       when: always
-#     - if: '$CI_COMMIT_BRANCH == "master"'
-#       when: always
+# Upload the documentation to pages if it's a tagged commit
+pages:
+  extends: .py_venv
+  stage: Publish Pages
+  needs: []
+  script:
+    - sphinx-build docs public -b html
+  artifacts:
+    paths:
+    - public
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: always
   
-# pdf_make:  
-#   extends: .py_venv
-#   stage: Build Documentation
-#   needs: []
-#   script:
-#     - sphinx-build docs latex -b latex
+pdf_make:  
+  extends: .py_venv
+  stage: Build Documentation
+  needs: []
+  script:
+    - sphinx-build docs latex -b latex
   
-#   artifacts:
-#     paths:
-#     - latex
-#     expire_in: 1 hour
+  artifacts:
+    paths:
+    - latex
+    expire_in: 1 hour
     
-# pdf_compile:
-#   needs: ["pdf_make"]
-#   stage: Compile Documentation
-#   image:  charlesbaynham/ctanfull
-#   artifacts:
-#     paths:
-#     - generic_scpi_driver.pdf
-#     expose_as: "Manual"
-#     name: ${CI_COMMIT_REF_SLUG}_manual.pdf
-#   script:
-#     - cd latex
-#     - make
-#     - cp generic_scpi_driver.pdf ../generic_scpi_driver.pdf
+pdf_compile:
+  needs: ["pdf_make"]
+  stage: Compile Documentation
+  image:  charlesbaynham/ctanfull
+  artifacts:
+    paths:
+    - generic_scpi_driver.pdf
+    expose_as: "Manual"
+    name: ${CI_COMMIT_REF_SLUG}_manual.pdf
+  script:
+    - cd latex
+    - make
+    - cp generic_scpi_driver.pdf ../generic_scpi_driver.pdf
 
-# # Copied contents of Gitlab's Code-Quality.gitlab-ci.yml so I can edit the rules
+# Copied contents of Gitlab's Code-Quality.gitlab-ci.yml so I can edit the rules
 
-# code_quality:
-#   stage: Static Analysis
-#   needs: []
-#   image: docker:19.03.5
-#   allow_failure: true
-#   services:
-#     - docker:19.03.5-dind
-#   variables:
-#     DOCKER_DRIVER: overlay2
-#     DOCKER_TLS_CERTDIR: ""
-#     CODE_QUALITY_IMAGE: "registry.gitlab.com/gitlab-org/ci-cd/codequality:0.85.9"
-#   script:
-#     - |
-#       if ! docker info &>/dev/null; then
-#         if [ -z "$DOCKER_HOST" -a "$KUBERNETES_PORT" ]; then
-#           export DOCKER_HOST='tcp://localhost:2375'
-#         fi
-#       fi
-#     - docker pull --quiet "$CODE_QUALITY_IMAGE"
-#     - docker run
-#         --env SOURCE_CODE="$PWD"
-#         --volume "$PWD":/code
-#         --volume /var/run/docker.sock:/var/run/docker.sock
-#         "$CODE_QUALITY_IMAGE" /code
-#   artifacts:
-#     reports:
-#       codequality: gl-code-quality-report.json
-#     expire_in: 1 week
-#   dependencies: []
+code_quality:
+  stage: Static Analysis
+  needs: []
+  image: docker:19.03.5
+  allow_failure: true
+  services:
+    - docker:19.03.5-dind
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+    CODE_QUALITY_IMAGE: "registry.gitlab.com/gitlab-org/ci-cd/codequality:0.85.9"
+  script:
+    - |
+      if ! docker info &>/dev/null; then
+        if [ -z "$DOCKER_HOST" -a "$KUBERNETES_PORT" ]; then
+          export DOCKER_HOST='tcp://localhost:2375'
+        fi
+      fi
+    - docker pull --quiet "$CODE_QUALITY_IMAGE"
+    - docker run
+        --env SOURCE_CODE="$PWD"
+        --volume "$PWD":/code
+        --volume /var/run/docker.sock:/var/run/docker.sock
+        "$CODE_QUALITY_IMAGE" /code
+  artifacts:
+    reports:
+      codequality: gl-code-quality-report.json
+    expire_in: 1 week
+  dependencies: []
   
-#   rules:
-#     - if: '$CI_PROJECT_URL =~ /^.*gitlab.com.*/'
-#       when: always
+  rules:
+    - if: '$CI_PROJECT_URL =~ /^.*gitlab.com.*/'
+      when: always
