@@ -154,9 +154,14 @@ class GenericDriver:
         try:
             self.id = get_com_port_by_hwid(id)
             if self.id.lower() == id.lower():
-                logging.warning(('Initiated device from COM port: it would be more '
-                                 'robust to use the HWID instead. For "%s", that\'s "%s"'),
-                                self.id, get_hwid_from_com_port(self.id))
+                logging.warning(
+                    (
+                        "Initiated device from COM port: it would be more "
+                        'robust to use the HWID instead. For "%s", that\'s "%s"'
+                    ),
+                    self.id,
+                    get_hwid_from_com_port(self.id),
+                )
         except RuntimeError as e:
             if simulation:
                 # Simulation mode, so don't worry about a missing device

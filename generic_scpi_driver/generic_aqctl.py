@@ -1,8 +1,8 @@
 import argparse
 import logging
 
-from sipyco.pc_rpc import simple_server_loop
 from sipyco import common_args
+from sipyco.pc_rpc import simple_server_loop
 
 
 def get_controller_func(name, default_port, driver_class):
