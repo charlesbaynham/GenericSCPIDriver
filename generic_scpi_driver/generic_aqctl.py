@@ -1,5 +1,4 @@
 import argparse
-import logging
 
 from sipyco import common_args
 from sipyco.pc_rpc import simple_server_loop
@@ -18,7 +17,6 @@ def get_controller_func(name, default_port, driver_class):
     Returns:
         function: A function to launch the controller
     """
-    logger = logging.getLogger(name)
 
     def main(extra_args=None):
         def get_argparser():
