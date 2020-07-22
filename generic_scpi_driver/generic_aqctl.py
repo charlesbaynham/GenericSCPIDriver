@@ -4,7 +4,7 @@ from sipyco import common_args
 from sipyco.pc_rpc import simple_server_loop
 
 
-def get_controller_func(name, default_port, driver_class):
+def get_controller_func(name, default_port, driver_class, driver_kwargs={}):
     """Generate a function which will launch an ARTIQ controller for the provided class
 
     The generated controller will only accept "--id" and "--simulation" command-line parameters. 
@@ -12,7 +12,8 @@ def get_controller_func(name, default_port, driver_class):
     Args:
         name (str): Name of the controller to launch
         default_port (int): Default port if not provided
-        driver_class (object): Driver class. Probably a GenericDriver, but not required to be. 
+        driver_class (object): Driver class. Probably a GenericDriver, but not required to be
+        driver_kwargs (dict): Additional arguments to pass to the driver object constuctor
 
     Returns:
         function: A function to launch the controller
@@ -44,7 +45,7 @@ def get_controller_func(name, default_port, driver_class):
         common_args.init_logger_from_args(args)
 
         simple_server_loop(
-            {name: driver_class(None, id=args.id, simulation=args.simulation)},
+            {name: driver_class(None, id=args.id, simulation=args.simulation, **driver_kwargs)},
             host=common_args.bind_address_from_args(args),
             port=args.port,
         )
