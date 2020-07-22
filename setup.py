@@ -23,11 +23,16 @@ setup(
     license="None",
     author="Charles Baynham",
     author_email="charles.baynham@npl.co.uk",
-    description="A generic template for creating python object-based drivers for SCPI hardware devices which communicate via VISA. Compatible with ARTIQ. ",
+    description=("A generic template for creating python object-based drivers for SCPI "
+                 "hardware devices which communicate via VISA. Compatible with ARTIQ if "
+                 "installed with [artiq] modifier"),
     long_description=read("README.rst"),
     packages=find_packages(exclude=("tests",)),
-    install_requires=["pyvisa", "pyserial", "sipyco"],
-    extras_require={"dev": ["pre-commit", "tox", "sphinx", "sphinx_rtd_theme"]},
+    install_requires=["pyvisa", "pyserial"],
+    extras_require={
+        "dev": ["pre-commit", "tox", "sphinx", "sphinx_rtd_theme"],
+        "artiq": ["sipyco @ git+https://github.com/m-labs/sipyco.git"],
+    },
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Programming Language :: Python",
