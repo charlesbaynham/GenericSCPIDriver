@@ -45,7 +45,11 @@ def get_controller_func(name, default_port, driver_class, driver_kwargs={}):
         common_args.init_logger_from_args(args)
 
         simple_server_loop(
-            {name: driver_class(None, id=args.id, simulation=args.simulation, **driver_kwargs)},
+            {
+                name: driver_class(
+                    None, id=args.id, simulation=args.simulation, **driver_kwargs
+                )
+            },
             host=common_args.bind_address_from_args(args),
             port=args.port,
         )

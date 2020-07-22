@@ -131,7 +131,15 @@ class GenericDriver:
 
     _simulator_factory = None
 
-    def __init__(self, *args, id=None, simulation=False, baud_rate=57600, command_separator=' ', **kwargs):
+    def __init__(
+        self,
+        *args,
+        id=None,
+        simulation=False,
+        baud_rate=57600,
+        command_separator=" ",
+        **kwargs
+    ):
         """Make a new device driver
 
         If your child class also has an init function, don't forget to call
