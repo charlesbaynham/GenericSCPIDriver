@@ -131,7 +131,7 @@ class GenericDriver:
 
     _simulator_factory = None
 
-    def __init__(self, *args, id=None, simulation=False, baud_rate=57600, **kwargs):
+    def __init__(self, *args, id=None, simulation=False, baud_rate=57600, command_separator=' ', **kwargs):
         """Make a new device driver
 
         If your child class also has an init function, don't forget to call
@@ -147,6 +147,8 @@ class GenericDriver:
         driver constructors.
         """
         logging.debug("Creating new driver object for device %s", id)
+
+        self.command_separator = command_separator
 
         # ID of the device that this driver controls
         if not id:
@@ -254,7 +256,7 @@ class GenericDriver:
             for arg, registered_arg in zip(args, registered_args):
                 arg_strings.append(registered_arg.validator(arg))
 
-            cmd_string = " ".join([device_command] + arg_strings)
+            cmd_string = self.command_separator.join([device_command] + arg_strings)
 
             if response_parser:
                 r = self.instr.query(cmd_string)
