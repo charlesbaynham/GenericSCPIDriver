@@ -47,7 +47,7 @@ cache:
     - pip install virtualenv
     - virtualenv venv
     - source venv/bin/activate
-    - pip install .[dev]
+    - pip install .[dev,artiq]
 
 ### Linting ###
 
