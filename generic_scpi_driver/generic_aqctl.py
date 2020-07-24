@@ -51,12 +51,18 @@ def get_controller_func(name, default_port, driver_class, driver_kwargs={}):
 
         loop = asyncio.get_event_loop()
 
+        # Start an ARTIQ server for this device.
+        #
+        # Allow parallel connections so that functions which don't touch the
+        # serial device can be done simultaneously: functions which do are
+        # protected by @with_lock.
         server = Server(
             {
                 name: driver_obj
             },
             description="An automatically generated server for {}".format(driver_class.__name__),
             builtin_terminate=True,
+            allow_parallel=True,
         )
 
         loop.run_until_complete(server.start(

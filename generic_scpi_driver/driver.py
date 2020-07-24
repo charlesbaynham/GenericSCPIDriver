@@ -335,7 +335,7 @@ class GenericDriver:
 
         # Compile the wrapping function to call the one we already defined
         if coroutine:
-            func_code_str = """def wrapping_func({args}): return func_async({args})""".format(
+            func_code_str = """async def wrapping_func({args}): return await func_async({args})""".format(
                 args=all_arg_names
             )
         else:
