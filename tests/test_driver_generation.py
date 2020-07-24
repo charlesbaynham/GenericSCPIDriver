@@ -14,15 +14,15 @@ def test_driver_method_registration_simple():
     class Driver(GenericDriver):
         pass
 
-    Driver.register_query("get_identity", "*IDN?")
+    Driver._register_query("get_identity", "*IDN?")
 
 
 def test_driver_method_registration_output_parser():
     class Driver(GenericDriver):
         pass
 
-    Driver.register_query("get_status", "STAT?", response_parser=int)
-    Driver.register_query("get_status", "STAT?", response_parser=lambda x: int(x) * 10)
+    Driver._register_query("get_status", "STAT?", response_parser=int)
+    Driver._register_query("get_status", "STAT?", response_parser=lambda x: int(x) * 10)
 
 
 def test_driver_method_registration_input_parser():
@@ -34,7 +34,7 @@ def test_driver_method_registration_input_parser():
             raise ValueError
         return mode
 
-    Driver.register_query(
+    Driver._register_query(
         "set_output_mode",
         "OUTP",
         args=[
@@ -50,22 +50,22 @@ def test_simulated_error():
         pass
 
     # Driver with one simple command
-    Driver.register_query("get_identity", "*IDN?")
+    Driver._register_query("get_identity", "*IDN?")
 
     # Error because we haven't set up simulation mode yet
     with pytest.raises(RuntimeError):
         Driver(id="anything", simulation=True)
 
 
-def test_register_simulator():
+def test__register_simulator():
     class Driver(GenericDriver):
         pass
 
     # Driver with one simple command
-    Driver.register_query("get_identity", "*IDN?")
+    Driver._register_query("get_identity", "*IDN?")
 
     # Register the simulator
-    Driver.register_simulator(Mock)
+    Driver._register_simulator(Mock)
 
     Driver(id="anything", simulation=True)
 
@@ -75,12 +75,12 @@ def test_calling():
         pass
 
     # Driver with one simple command
-    Driver.register_query("get_identity", "*IDN?")
-    Driver.register_query("get_version", "*VER?")
+    Driver._register_query("get_identity", "*IDN?")
+    Driver._register_query("get_version", "*VER?")
 
     # Register a simulator
     sim = Mock(unsafe=True)
-    Driver.register_simulator(lambda: sim)
+    Driver._register_simulator(lambda: sim)
 
     d = Driver(id="anything", simulation=True)
 
@@ -96,13 +96,13 @@ def test_response():
         pass
 
     # Driver with one command
-    Driver.register_query("get_identity", "*IDN?")
+    Driver._register_query("get_identity", "*IDN?")
 
     # Register a simulator
     sim = Mock(unsafe=True)
     sim.query = Mock(return_value="Test device")
 
-    Driver.register_simulator(lambda: sim)
+    Driver._register_simulator(lambda: sim)
 
     d = Driver(id="anything", simulation=True)
 
@@ -114,13 +114,13 @@ def test_response_parsing():
         pass
 
     # Driver with one command
-    Driver.register_query("get_identity", "*IDN?", response_parser=int)
+    Driver._register_query("get_identity", "*IDN?", response_parser=int)
 
     # Register a simulator
     sim = Mock(unsafe=True)
     sim.query = Mock(return_value="123")
 
-    Driver.register_simulator(lambda: sim)
+    Driver._register_simulator(lambda: sim)
 
     d = Driver(id="anything", simulation=True)
 
@@ -137,13 +137,13 @@ def test_response_validation():
             raise ValueError
         return v
 
-    Driver.register_query("get_identity", "*IDN?", response_parser=validator)
+    Driver._register_query("get_identity", "*IDN?", response_parser=validator)
 
     # Register a simulator
     sim = Mock(unsafe=True)
     sim.query = Mock()
 
-    Driver.register_simulator(lambda: sim)
+    Driver._register_simulator(lambda: sim)
 
     d = Driver(id="anything", simulation=True)
 
@@ -163,13 +163,13 @@ def test_command_args():
     class Driver(GenericDriver):
         pass
 
-    Driver.register_query("get_mode", "MODE?", args=[("channel", None)])
+    Driver._register_query("get_mode", "MODE?", args=[("channel", None)])
 
     # Register a simulator
     sim = Mock(unsafe=True)
     sim.query = Mock(return_value="on")
 
-    Driver.register_simulator(lambda: sim)
+    Driver._register_simulator(lambda: sim)
 
     d = Driver(id="something", simulation=True)
 
@@ -184,13 +184,13 @@ def test_command_args_default():
     class Driver(GenericDriver):
         pass
 
-    Driver.register_query("get_mode", "MODE?", args=[("channel", "1")])
+    Driver._register_query("get_mode", "MODE?", args=[("channel", "1")])
 
     # Register a simulator
     sim = Mock(unsafe=True)
     sim.query = Mock(return_value="on")
 
-    Driver.register_simulator(lambda: sim)
+    Driver._register_simulator(lambda: sim)
 
     d = Driver(id="something", simulation=True)
 
@@ -202,7 +202,7 @@ def test_command_args_default_multiple():
     class Driver(GenericDriver):
         pass
 
-    Driver.register_query(
+    Driver._register_query(
         "get_mode", "MODE?", args=[("a", None), ("b", "second_arg_default")],
     )
 
@@ -210,7 +210,7 @@ def test_command_args_default_multiple():
     sim = Mock(unsafe=True)
     sim.query = Mock()
 
-    Driver.register_simulator(lambda: sim)
+    Driver._register_simulator(lambda: sim)
 
     d = Driver(id="something", simulation=True)
 
@@ -231,7 +231,7 @@ def test_command_args_keywords():
     class Driver(GenericDriver):
         pass
 
-    Driver.register_query(
+    Driver._register_query(
         "get_mode", "MODE?", args=[("a", None), ("b", "second_arg_default")],
     )
 
@@ -239,7 +239,7 @@ def test_command_args_keywords():
     sim = Mock(unsafe=True)
     sim.query = Mock()
 
-    Driver.register_simulator(lambda: sim)
+    Driver._register_simulator(lambda: sim)
 
     d = Driver(id="something", simulation=True)
 
@@ -274,7 +274,7 @@ def test_command_args_backwards():
 
     # Attempt to put an arg without a default value after one with a default
     with pytest.raises(ValueError):
-        Driver.register_query(
+        Driver._register_query(
             "get_mode", "MODE?", args=[("b", "second_arg_default"), ("a", None),],
         )
 
@@ -283,7 +283,7 @@ def test_command_args_validators():
     class Driver(GenericDriver):
         pass
 
-    Driver.register_query(
+    Driver._register_query(
         "get_mode", "MODE?", args=[("a", None, lambda num: "{:.1f}".format(num))],
     )
 
@@ -291,7 +291,7 @@ def test_command_args_validators():
     sim = Mock(unsafe=True)
     sim.query = Mock()
 
-    Driver.register_simulator(lambda: sim)
+    Driver._register_simulator(lambda: sim)
 
     d = Driver(id="something", simulation=True)
 

@@ -82,7 +82,7 @@ def with_lock(f):
 
     @wraps(f)
     def wrapped(self, *args, **kw):
-        with _locks[self.id]:
+        with _locks[self.dev_id]:
             return f(self, *args, **kw)
 
     wrapped.__name__ = f.__name__
@@ -120,14 +120,14 @@ class GenericDriver:
     Template for devices which communicate by sending / receiving text commands.
     This class should be inherited by your driver.
 
-    You can register new commands by calling :meth:`GenericDriver.register_query`. This will create a
+    You can register new commands by calling :meth:`GenericDriver._register_query`. This will create a
     method on the class which queries your device returns the response. The
     class builder supports input and output validation as well as custom error
     handling.
 
     If you need more advanced logic in your driver, you can still just add
     methods as normal. They'll work side-by-side with methods registered by
-    :meth:`GenericDriver.register_query`.
+    :meth:`GenericDriver._register_query`.
     """
 
     _simulator_factory = None
@@ -182,27 +182,28 @@ class GenericDriver:
 
         logging.debug("Found device %s on COM port %s", id, self.id)
 
+        self.dev_id = str(self.__class__) + self.id
+        if simulation:
+            self.dev_id += "Sim"
+
+        logging.debug(
+            "Accessing controller {} with locks {}".format(self.dev_id, _locks)
+        )
+
         # Create a Lock for this resource if it doesn't already exist. This lives
         # in the namespace of this module and so is common across all Drivers,
         # just in case you make multiple drivers pointing to the same device for
         # some reason
-        if self.id not in _locks:
-            _locks[self.id] = RLock()
+        if self.dev_id not in _locks:
+            _locks[self.dev_id] = RLock()
 
         # Claim this device exclusivly while we manipulate it
-        with _locks[self.id]:
-            self.dev_id = str(self.__class__) + self.id
-            if simulation:
-                self.dev_id += "Sim"
-
-            logging.debug(
-                "Accessing controller {} with locks {}".format(self.dev_id, _locks)
-            )
+        with _locks[self.dev_id]:
 
             if simulation:
                 if not self.__class__._simulator_factory:
                     raise RuntimeError(
-                        "Simulation mode is not available: you must first call register_simulator"
+                        "Simulation mode is not available: you must first call _register_simulator"
                     )
                 if self.dev_id not in _visa_sessions:
                     _visa_sessions[self.dev_id] = self.__class__._simulator_factory()
@@ -237,7 +238,7 @@ class GenericDriver:
         return _visa_sessions[self.dev_id]
 
     @classmethod
-    def register_simulator(cls, simulator_factory):
+    def _register_simulator(cls, simulator_factory):
         """Register a simulator for this class
 
         If you call this method with a function that creates a simulator (i.e. a
@@ -256,7 +257,7 @@ class GenericDriver:
     Arg.__new__.__defaults__ = (None, str)  # type: ignore
 
     @classmethod
-    def register_query(
+    def _register_query(
         cls,
         method_name: str,
         device_command: str,
@@ -423,11 +424,11 @@ and expects you to pass it {} arguments named {}.
         return instr
 
 
-# register_query(Driver, "get_identity", "*idn", response_validator=None)
-# register_query(Driver, "get_status", "stat", response_parser=lambda x:
+# _register_query(Driver, "get_identity", "*idn", response_validator=None)
+# _register_query(Driver, "get_status", "stat", response_parser=lambda x:
 #                int(x, 2), response_validator=None)
-# register_query(Driver,
+# _register_query(Driver,
 #                "get_version", "*git", response_parser=int, response_validator=None)
 
 # # register_command(Driver, "calibrate", "CALI", response_validator=None)
-# # register_query(Driver, "set_measurement_mode", "MODE", response_parser=int, args=[('mode', int, ...)])
+# # _register_query(Driver, "set_measurement_mode", "MODE", response_parser=int, args=[('mode', int, ...)])
