@@ -264,6 +264,7 @@ class GenericDriver:
         response_validator=None,
         args=[],
         coroutine=False,
+        docstring=None,
     ):
         """Make a function for this class which will access the device. 
 
@@ -274,6 +275,7 @@ class GenericDriver:
             response_validator (callable, optional): Functio to pass the response to before the parser. Can raise an error. Returns are ignored. Defaults to None.
             args (list, optional): List of arguments for the command, as ``GenericDriver.Arg`` objects. Defaults to [].
             coroutine (bool, optional): If true, create an async coroutine instead of a normal method, wrapping serial calls in a threaded executor. Defaults to False.
+            docstring (str, optional): Docstring for the created method.
         """
         registered_args = [GenericDriver.Arg(*a) for a in args]
 
@@ -353,17 +355,20 @@ class GenericDriver:
         )
 
         # Add a doc string
-        wrapping_func.__doc__ = """
+        if not docstring:
+            docstring = """
 Query "{}"
 
 This function is automatically generated. It will call the command "{}"
 and expects you to pass it {} arguments named {}.
         """.format(
-            method_name,
-            device_command,
-            len(args),
-            [arg.name for arg in registered_args],
-        ).strip()
+                method_name,
+                device_command,
+                len(args),
+                [arg.name for arg in registered_args],
+            ).strip()
+
+        wrapping_func.__doc__ = docstring
 
         setattr(cls, method_name, wrapping_func)
 
