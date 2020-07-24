@@ -308,7 +308,7 @@ class GenericDriver:
             loop = asyncio.get_event_loop()
             return await loop.run_in_executor(None, partial(func, self, *args))
 
-        logging.info("Registering method %s with coroutine = %s", method_name, coroutine)
+        logging.debug("Registering method %s with coroutine = %s", method_name, coroutine)
 
         # Build a python function which takes the arguments as named. This is useful because now our bound methods
         # are real python methods, and so can respond to e.g.
