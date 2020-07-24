@@ -44,14 +44,19 @@ def get_controller_func(name, default_port, driver_class, driver_kwargs={}):
         args = get_argparser().parse_args(extra_args)
         common_args.init_logger_from_args(args)
 
-        simple_server_loop(
-            {
-                name: driver_class(
-                    None, id=args.id, simulation=args.simulation, **driver_kwargs
-                )
-            },
-            host=common_args.bind_address_from_args(args),
-            port=args.port,
+        driver_obj = driver_class(
+            None, id=args.id, simulation=args.simulation, **driver_kwargs
         )
+
+        try:
+            simple_server_loop(
+                {
+                    name: driver_obj
+                },
+                host=common_args.bind_address_from_args(args),
+                port=args.port,
+            )
+        finally:
+            driver_obj.close()
 
     return main

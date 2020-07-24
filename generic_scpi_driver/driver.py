@@ -214,6 +214,16 @@ class GenericDriver:
 
         self.check_connection()
 
+    def close(self):
+        '''
+        Close the connection to this device.
+
+        After this method is called, no other methods will work and this object should be discarded.
+        '''
+        self.instr.close()
+        del _locks[self.dev_id]
+        del _visa_sessions[self.dev_id]
+
     @property
     def instr(self):
         """
