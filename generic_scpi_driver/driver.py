@@ -4,10 +4,11 @@ interface, using VISA communications
 
 This module can be used to generate a driver for a device which communicates with simple SCPI commands.
 """
+import asyncio
 import logging
 import re
 from collections import namedtuple
-from functools import wraps
+from functools import partial, wraps
 from threading import RLock
 from types import FunctionType
 
@@ -220,6 +221,7 @@ class GenericDriver:
 
         After this method is called, no other methods will work and this object should be discarded.
         '''
+        logging.warning("Closing VISA connection to device %s", self.dev_id)
         self.instr.close()
         del _locks[self.dev_id]
         del _visa_sessions[self.dev_id]
@@ -261,7 +263,18 @@ class GenericDriver:
         response_parser=str,
         response_validator=None,
         args=[],
+        coroutine=False,
     ):
+        """Make a function for this class which will access the device. 
+
+        Args:
+            method_name (str): Name of the method to create
+            device_command (str): Command to send to the device. Arguments can follow
+            response_parser (callable, optional): Function to pass the response to. Must return a string. Defaults to identity function.
+            response_validator (callable, optional): Functio to pass the response to before the parser. Can raise an error. Returns are ignored. Defaults to None.
+            args (list, optional): List of arguments for the command, as ``GenericDriver.Arg`` objects. Defaults to [].
+            coroutine (bool, optional): If true, create an async coroutine instead of a normal method, wrapping serial calls in a threaded executor. Defaults to False.
+        """
         registered_args = [GenericDriver.Arg(*a) for a in args]
 
         # Define a function that will be called with the arguments provided.
@@ -288,6 +301,12 @@ class GenericDriver:
             else:
                 self.instr.write(cmd_string)
 
+        async def func_async(self, *args):
+            loop = asyncio.get_event_loop()
+            return await loop.run_in_executor(None, partial(func, self, *args))
+
+        logging.info("Registering method %s with coroutine = %s", method_name, coroutine)
+
         # Build a python function which takes the arguments as named. This is useful because now our bound methods
         # are real python methods, and so can respond to e.g.
         #     obj.set_mode(1)
@@ -312,9 +331,14 @@ class GenericDriver:
                     )
 
         # Compile the wrapping function to call the one we already defined
-        func_code_str = """def wrapping_func({args}): return func({args})""".format(
-            args=all_arg_names
-        )
+        if coroutine:
+            func_code_str = """def wrapping_func({args}): return func_async({args})""".format(
+                args=all_arg_names
+            )
+        else:
+            func_code_str = """def wrapping_func({args}): return func({args})""".format(
+                args=all_arg_names
+            )
 
         wrapping_func_code = compile(func_code_str, "<string>", "exec")
 

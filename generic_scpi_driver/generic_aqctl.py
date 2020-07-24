@@ -1,7 +1,8 @@
 import argparse
+import asyncio
 
 from sipyco import common_args
-from sipyco.pc_rpc import simple_server_loop
+from sipyco.pc_rpc import Server
 
 
 def get_controller_func(name, default_port, driver_class, driver_kwargs={}):
@@ -48,15 +49,30 @@ def get_controller_func(name, default_port, driver_class, driver_kwargs={}):
             None, id=args.id, simulation=args.simulation, **driver_kwargs
         )
 
+        loop = asyncio.get_event_loop()
+
+        server = Server(
+            {
+                name: driver_obj
+            },
+            description="An automatically generated server for {}".format(driver_class.__name__),
+            builtin_terminate=True,
+        )
+
+        loop.run_until_complete(server.start(
+            host=common_args.bind_address_from_args(args),
+            port=args.port,
+        ))
+
         try:
-            simple_server_loop(
-                {
-                    name: driver_obj
-                },
-                host=common_args.bind_address_from_args(args),
-                port=args.port,
-            )
+            loop.run_until_complete(server.wait_terminate())
         finally:
-            driver_obj.close()
+            try:
+                loop.run_until_complete(server.stop())
+            finally:
+                # Close the VISA connection after the server has shutdown
+                driver_obj.close()
+
+            loop.close()
 
     return main
