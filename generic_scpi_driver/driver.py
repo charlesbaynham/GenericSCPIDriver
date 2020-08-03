@@ -7,6 +7,7 @@ This module can be used to generate a driver for a device which communicates wit
 import asyncio
 import logging
 import re
+import time
 from collections import namedtuple
 from functools import partial, wraps
 from threading import RLock
@@ -104,12 +105,7 @@ def with_handler(f):
         try:
             return f(self, *args, **kw)
         except pyvisa.VisaIOError:
-            self.instr.flush(
-                pyvisa.constants.VI_READ_BUF_DISCARD
-                | pyvisa.constants.VI_WRITE_BUF_DISCARD
-                | pyvisa.constants.VI_IO_IN_BUF_DISCARD
-                | pyvisa.constants.VI_IO_OUT_BUF_DISCARD
-            )
+            self._flush_all_buffers()
 
             raise
 
@@ -219,6 +215,7 @@ class GenericDriver:
                     _visa_sessions[self.dev_id] = self._setup_device(
                         self.id, baud_rate=baud_rate, **kwargs
                     )
+                    self._flush_all_buffers()
 
         self.check_connection()
 
@@ -398,11 +395,27 @@ and expects you to pass it {} arguments named {}.
         """
         pass
 
+    def _flush_all_buffers(self):
+        self.instr.flush(
+            pyvisa.constants.VI_READ_BUF_DISCARD
+            | pyvisa.constants.VI_WRITE_BUF_DISCARD
+            | pyvisa.constants.VI_IO_IN_BUF_DISCARD
+            | pyvisa.constants.VI_IO_OUT_BUF_DISCARD
+        )
+
     @staticmethod
     def _setup_device(
-        id, baud_rate, read_termination="\n", write_termination="\n", timeout=None
+        id,
+        baud_rate,
+        read_termination="\n",
+        write_termination="\n",
+        timeout=None,
+        wait_after_connect=0.0,
     ):
         """Open a visa connection to the device
+
+        Params:
+            wait_after_connect - Time to wait after opening the connection before flushing it [s]
 
         Raises:
             RuntimeError: Raised if VISA comms fail
@@ -429,7 +442,8 @@ and expects you to pass it {} arguments named {}.
         # instr.parity = visa.constants.Parity.none
         # instr.flow_control = visa.constants.VI_ASRL_FLOW_NONE
 
-        instr.flush()
+        if wait_after_connect:
+            time.sleep(wait_after_connect)
 
         logging.debug('Device "{}" init complete'.format(id))
 
