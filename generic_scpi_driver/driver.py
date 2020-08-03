@@ -297,6 +297,8 @@ class GenericDriver:
 
             logging.debug("Sending command '%s'", cmd_string)
 
+            self._flush_all_buffers()
+
             if response_parser:
                 r = self.instr.query(cmd_string)
 
