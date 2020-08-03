@@ -93,10 +93,10 @@ def with_lock(f):
 
 def with_handler(f):
     """
-    Decorator to wrap function in a try/except block, handling VISAIOErrors by clear()ing the device,
+    Decorator to wrap function in a try/except block, handling VISAIOErrors by flush()ing the device,
     then passing on the exception.
 
-    This decorator expects the instance method self.instr.clear() to exit
+    This decorator expects the instance method self.instr.flush() to exit
     """
 
     @wraps(f)
@@ -104,7 +104,13 @@ def with_handler(f):
         try:
             return f(self, *args, **kw)
         except pyvisa.VisaIOError:
-            self.instr.clear()
+            self.instr.flush(
+                pyvisa.constants.VI_READ_BUF_DISCARD
+                | pyvisa.constants.VI_WRITE_BUF_DISCARD
+                | pyvisa.constants.VI_IO_IN_BUF_DISCARD
+                | pyvisa.constants.VI_IO_OUT_BUF_DISCARD
+            )
+
             raise
 
     wrapped.__name__ = f.__name__
@@ -217,11 +223,11 @@ class GenericDriver:
         self.check_connection()
 
     def close(self):
-        '''
+        """
         Close the connection to this device.
 
         After this method is called, no other methods will work and this object should be discarded.
-        '''
+        """
         logging.warning("Closing VISA connection to device %s", self.dev_id)
         self.instr.close()
         del _locks[self.dev_id]
@@ -292,6 +298,8 @@ class GenericDriver:
 
             cmd_string = self.command_separator.join([device_command] + arg_strings)
 
+            logging.debug("Sending command '%s'", cmd_string)
+
             if response_parser:
                 r = self.instr.query(cmd_string)
 
@@ -308,7 +316,9 @@ class GenericDriver:
             loop = asyncio.get_event_loop()
             return await loop.run_in_executor(None, partial(func, self, *args))
 
-        logging.debug("Registering method %s with coroutine = %s", method_name, coroutine)
+        logging.debug(
+            "Registering method %s with coroutine = %s", method_name, coroutine
+        )
 
         # Build a python function which takes the arguments as named. This is useful because now our bound methods
         # are real python methods, and so can respond to e.g.
@@ -418,6 +428,8 @@ and expects you to pass it {} arguments named {}.
         # instr.stop_bits = visa.constants.StopBits.one
         # instr.parity = visa.constants.Parity.none
         # instr.flow_control = visa.constants.VI_ASRL_FLOW_NONE
+
+        instr.flush()
 
         logging.debug('Device "{}" init complete'.format(id))
 
