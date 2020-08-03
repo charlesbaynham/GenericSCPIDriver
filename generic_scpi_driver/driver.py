@@ -161,6 +161,7 @@ class GenericDriver:
         logging.debug("Creating new driver object for device %s", id)
 
         self.command_separator = command_separator
+        self.simulation = simulation
 
         # ID of the device that this driver controls
         if not id:
@@ -399,12 +400,13 @@ and expects you to pass it {} arguments named {}.
         pass
 
     def _flush_all_buffers(self):
-        self.instr.flush(
-            pyvisa.constants.VI_READ_BUF_DISCARD
-            | pyvisa.constants.VI_WRITE_BUF_DISCARD
-            | pyvisa.constants.VI_IO_IN_BUF_DISCARD
-            | pyvisa.constants.VI_IO_OUT_BUF_DISCARD
-        )
+        if not self.simulation:
+            self.instr.flush(
+                pyvisa.constants.VI_READ_BUF_DISCARD
+                | pyvisa.constants.VI_WRITE_BUF_DISCARD
+                | pyvisa.constants.VI_IO_IN_BUF_DISCARD
+                | pyvisa.constants.VI_IO_OUT_BUF_DISCARD
+            )
 
     @staticmethod
     def _setup_device(
