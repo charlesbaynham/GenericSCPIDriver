@@ -66,7 +66,10 @@ def get_controller_func(name, default_port, driver_class, driver_kwargs={}):
         )
 
         loop.run_until_complete(
-            server.start(host=common_args.bind_address_from_args(args), port=args.port,)
+            server.start(
+                host=common_args.bind_address_from_args(args),
+                port=args.port,
+            )
         )
 
         try:
