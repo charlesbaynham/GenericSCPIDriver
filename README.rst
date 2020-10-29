@@ -189,7 +189,7 @@ when the object is constucted and has the chance to raise an exception. Example:
                 raise RuntimeError(f"Bad device identity: got '{idn}'")
 
     # Note that it's fine to define functions later which get used in methods
-    defined previously
+    # defined previously
     SimpleDriver._register_query("get_identity", "*IDN")
 
 Simulation mode

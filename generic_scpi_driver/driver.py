@@ -278,7 +278,7 @@ class GenericDriver:
             method_name (str): Name of the method to create
             device_command (str): Command to send to the device. Arguments can follow
             response_parser (callable, optional): Function to pass the response to. Must return a string. Defaults to identity function.
-            response_validator (callable, optional): Functio to pass the response to before the parser. Can raise an error. Returns are ignored. Defaults to None.
+            response_validator (callable, optional): Function to pass the response to before the parser. Can raise an error. Returns are ignored. Defaults to None.
             args (list, optional): List of arguments for the command, as ``GenericDriver.Arg`` objects. Defaults to [].
             coroutine (bool, optional): If true, create an async coroutine instead of a normal method, wrapping serial calls in a threaded executor. Defaults to False.
             docstring (str, optional): Docstring for the created method.
