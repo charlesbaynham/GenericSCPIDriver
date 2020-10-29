@@ -115,6 +115,27 @@ If you'd prefer to process these, you can pass a ``response_parser`` function:
         response_parser=lambda x: x.split(","),
     )
 
+Error checking
+##############
+
+You can also add error checking to your commands. Pass a function as
+``response_validator`` and it will be called with the output from the device
+(not the parsed output of ``response_parser``) as its input. The
+``response_validator``'s return value will be ignored: it's only job is to raise
+an exception if needed. E.g.
+
+.. code-block:: python
+
+    def check_for_error(s):
+        if "error" in s.lower():
+            raise RuntimeError("Error returned by device: {}".format(s))
+    
+    SimpleDriver._register_query(
+        "do_something",
+        "DOOO",
+        response_validator=check_for_error,
+    )
+
 Asyncronous operation
 #####################
 
@@ -146,6 +167,30 @@ at a time (only relevant in multi-threaded applications).
             '''Do something complex'''
             response = self.instr.query("COMP 1 2 3")
             return int(response) + 5
+
+Startup checking
+################
+
+It can be useful to check on startup if communicatio with a device has been
+established successfully. To do this, define a method in the class called
+``check_connection``. Return value is ignored, but this method will be called
+when the object is constucted and has the chance to raise an exception. Example:
+
+.. code-block:: python
+
+    from generic_scpi_driver import GenericDriver, with_lock, with_handler
+
+    class SimpleDriver(GenericDriver):
+        '''A driver for my simple SCPI device'''
+
+        def check_connection(self):
+            idn = self.get_identity()
+            if idn != "My device":
+                raise RuntimeError(f"Bad device identity: got '{idn}'")
+
+    # Note that it's fine to define functions later which get used in methods
+    defined previously
+    SimpleDriver._register_query("get_identity", "*IDN")
 
 Simulation mode
 ###############

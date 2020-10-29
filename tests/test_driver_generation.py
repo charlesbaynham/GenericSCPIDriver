@@ -203,9 +203,7 @@ def test_command_args_default_multiple():
         pass
 
     Driver._register_query(
-        "get_mode",
-        "MODE?",
-        args=[("a", None), ("b", "second_arg_default")],
+        "get_mode", "MODE?", args=[("a", None), ("b", "second_arg_default")],
     )
 
     # Register a simulator
@@ -234,9 +232,7 @@ def test_command_args_keywords():
         pass
 
     Driver._register_query(
-        "get_mode",
-        "MODE?",
-        args=[("a", None), ("b", "second_arg_default")],
+        "get_mode", "MODE?", args=[("a", None), ("b", "second_arg_default")],
     )
 
     # Register a simulator
@@ -279,12 +275,7 @@ def test_command_args_backwards():
     # Attempt to put an arg without a default value after one with a default
     with pytest.raises(ValueError):
         Driver._register_query(
-            "get_mode",
-            "MODE?",
-            args=[
-                ("b", "second_arg_default"),
-                ("a", None),
-            ],
+            "get_mode", "MODE?", args=[("b", "second_arg_default"), ("a", None),],
         )
 
 
@@ -293,9 +284,7 @@ def test_command_args_validators():
         pass
 
     Driver._register_query(
-        "get_mode",
-        "MODE?",
-        args=[("a", None, lambda num: "{:.1f}".format(num))],
+        "get_mode", "MODE?", args=[("a", None, lambda num: "{:.1f}".format(num))],
     )
 
     # Register a simulator
