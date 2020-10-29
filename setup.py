@@ -23,9 +23,11 @@ setup(
     license="None",
     author="Charles Baynham",
     author_email="charles.baynham@npl.co.uk",
-    description=("A generic template for creating python object-based drivers for SCPI "
-                 "hardware devices which communicate via VISA. Compatible with ARTIQ if "
-                 "installed with [artiq] modifier"),
+    description=(
+        "A generic template for creating python object-based drivers for SCPI "
+        "hardware devices which communicate via VISA. Compatible with ARTIQ if "
+        "installed with [artiq] modifier"
+    ),
     long_description=read("README.rst"),
     packages=find_packages(exclude=("tests",)),
     install_requires=["pyvisa", "pyserial"],
