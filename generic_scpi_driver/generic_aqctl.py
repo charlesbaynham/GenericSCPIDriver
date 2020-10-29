@@ -8,7 +8,7 @@ from sipyco.pc_rpc import Server
 def get_controller_func(name, default_port, driver_class, driver_kwargs={}):
     """Generate a function which will launch an ARTIQ controller for the provided class
 
-    The generated controller will only accept "--id" and "--simulation" command-line parameters. 
+    The generated controller will only accept "--id" and "--simulation" command-line parameters.
 
     Args:
         name (str): Name of the controller to launch
@@ -57,18 +57,20 @@ def get_controller_func(name, default_port, driver_class, driver_kwargs={}):
         # serial device can be done simultaneously: functions which do are
         # protected by @with_lock.
         server = Server(
-            {
-                name: driver_obj
-            },
-            description="An automatically generated server for {}".format(driver_class.__name__),
+            {name: driver_obj},
+            description="An automatically generated server for {}".format(
+                driver_class.__name__
+            ),
             builtin_terminate=True,
             allow_parallel=True,
         )
 
-        loop.run_until_complete(server.start(
-            host=common_args.bind_address_from_args(args),
-            port=args.port,
-        ))
+        loop.run_until_complete(
+            server.start(
+                host=common_args.bind_address_from_args(args),
+                port=args.port,
+            )
+        )
 
         try:
             loop.run_until_complete(server.wait_terminate())

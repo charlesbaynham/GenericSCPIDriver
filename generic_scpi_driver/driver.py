@@ -9,7 +9,8 @@ import logging
 import re
 import time
 from collections import namedtuple
-from functools import partial, wraps
+from functools import partial
+from functools import wraps
 from threading import RLock
 from types import FunctionType
 
@@ -27,7 +28,7 @@ def get_hwid_from_com_port(com_port):
 
     The HWID of a device is (/ should be) a unique string that identifies it. Unlike the COM port,
     this string is intrinsic to the device and will never change. Referring to devices by these
-    strings is therefore a robust way of doing things. 
+    strings is therefore a robust way of doing things.
 
     Args:
         com_port (str): COM port e.g. "COM11"
@@ -51,13 +52,13 @@ def get_com_port_by_hwid(hwid):
 
     The HWID of a device is (/ should be) a unique string that identifies it. Unlike the COM port,
     this string is intrinsic to the device and will never change. Referring to devices by these
-    strings is therefore a robust way of doing things. 
+    strings is therefore a robust way of doing things.
 
     Args:
         hwid (str): Hardware ID string to match, e.g. 'USB VID:PID=0403:6001 SER=A6003SX4A'.
                     This is matched using serial.tools.list_ports.grep so can be less specific
                     if desired. The search should result in a single match otherwise an exception will
-                    be raised. 
+                    be raised.
 
     Raises:
         RuntimeError: Raised if the device is not found or multiple matches are found
@@ -270,7 +271,7 @@ class GenericDriver:
         coroutine=False,
         docstring=None,
     ):
-        """Make a function for this class which will access the device. 
+        """Make a function for this class which will access the device.
 
         Args:
             method_name (str): Name of the method to create
@@ -385,7 +386,7 @@ and expects you to pass it {} arguments named {}.
     @with_lock
     @with_handler
     def check_connection(self):
-        """ Check the connection to the device
+        """Check the connection to the device
 
         You should override this method if you want checks in the setup
 
