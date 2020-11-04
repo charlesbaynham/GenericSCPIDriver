@@ -30,7 +30,7 @@ setup(
     ),
     long_description=read("README.rst"),
     packages=find_packages(exclude=("tests",)),
-    install_requires=["pyvisa", "pyserial"],
+    install_requires=["pyvisa", "pyserial", "pyvisa-py>=0.5.1"],
     extras_require={
         "dev": ["pre-commit", "tox", "sphinx", "sphinx_rtd_theme"],
         "artiq": ["sipyco @ git+https://github.com/m-labs/sipyco.git"],

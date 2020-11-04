@@ -142,7 +142,7 @@ class GenericDriver:
         simulation=False,
         baud_rate=57600,
         command_separator=" ",
-        **kwargs
+        **kwargs,
     ):
         """Make a new device driver
 
@@ -428,11 +428,20 @@ and expects you to pass it {} arguments named {}.
         :rtype: :class:pyvisa.resources.Resource
         """
         # Get a handle to the instrument
-        rm = pyvisa.ResourceManager()
+        rm = pyvisa.ResourceManager("@py")
+
+        logging.debug(f"Devices: {rm.list_resources()}")
+
+        # pyvisa-py doesn't have "COM" aliases for ASRL serial ports, so convert
+        regex_match = re.match(r"^com(\d{1,3})$", id.lower())
+        if regex_match:
+            id = f"ASRL{regex_match[1]}"
+
+        logging.debug(f"Connecting to : {id}")
+
         instr = rm.open_resource(id)
 
-        logging.debug(rm.list_resources())
-        logging.debug(instr)
+        logging.debug(f"Connection: {instr}")
 
         # Configure the connection as required
         instr.baud_rate = baud_rate
