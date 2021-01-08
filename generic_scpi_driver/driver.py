@@ -221,6 +221,10 @@ class GenericDriver:
 
         self.check_connection()
 
+        logging.info(
+            "Controller {} successfully started and connected".format(self.dev_id)
+        )
+
     def close(self):
         """
         Close the connection to this device.
