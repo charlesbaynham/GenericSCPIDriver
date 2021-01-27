@@ -17,6 +17,8 @@ from types import FunctionType
 import pyvisa
 from serial.tools.list_ports import grep as grep_serial_ports
 
+logger = logging.getLogger("GenericSCPI")
+
 # from typing import Callable, List, Tuple
 
 _locks = {}
@@ -158,7 +160,7 @@ class GenericDriver:
         it can be used with ARTIQ which passes the device manager into new
         driver constructors.
         """
-        logging.debug("Creating new driver object for device %s", id)
+        logger.debug("Creating new driver object for device %s", id)
 
         self.command_separator = command_separator
         self.simulation = simulation
@@ -169,7 +171,7 @@ class GenericDriver:
         try:
             self.id = get_com_port_by_hwid(id)
             if self.id.lower() == id.lower():
-                logging.warning(
+                logger.warning(
                     (
                         "Initiated device from COM port: it would be more "
                         'robust to use the HWID instead. For "%s", that\'s "%s"'
@@ -184,13 +186,13 @@ class GenericDriver:
             else:
                 raise e
 
-        logging.debug("Found device %s on COM port %s", id, self.id)
+        logger.debug("Found device %s on COM port %s", id, self.id)
 
         self.dev_id = str(self.__class__) + self.id
         if simulation:
             self.dev_id += "Sim"
 
-        logging.debug(
+        logger.debug(
             "Accessing controller {} with locks {}".format(self.dev_id, _locks)
         )
 
@@ -221,7 +223,7 @@ class GenericDriver:
 
         self.check_connection()
 
-        logging.info(
+        logger.info(
             "Controller {} successfully started and connected".format(self.dev_id)
         )
 
@@ -231,7 +233,7 @@ class GenericDriver:
 
         After this method is called, no other methods will work and this object should be discarded.
         """
-        logging.warning("Closing VISA connection to device %s", self.dev_id)
+        logger.warning("Closing VISA connection to device %s", self.dev_id)
         self.instr.close()
         del _locks[self.dev_id]
         del _visa_sessions[self.dev_id]
@@ -301,7 +303,7 @@ class GenericDriver:
 
             cmd_string = self.command_separator.join([device_command] + arg_strings)
 
-            logging.debug("Sending command '%s'", cmd_string)
+            logger.debug("Sending command '%s'", cmd_string)
 
             self._flush_all_buffers()
 
@@ -321,7 +323,7 @@ class GenericDriver:
             loop = asyncio.get_event_loop()
             return await loop.run_in_executor(None, partial(func, self, *args))
 
-        logging.debug(
+        logger.debug(
             "Registering method %s with coroutine = %s", method_name, coroutine
         )
 
@@ -434,18 +436,18 @@ and expects you to pass it {} arguments named {}.
         # Get a handle to the instrument
         rm = pyvisa.ResourceManager("@py")
 
-        logging.debug(f"Devices: {rm.list_resources()}")
+        logger.debug(f"Devices: {rm.list_resources()}")
 
         # pyvisa-py doesn't have "COM" aliases for ASRL serial ports, so convert
         regex_match = re.match(r"^com(\d{1,3})$", id.lower())
         if regex_match:
             id = f"ASRL{regex_match[1]}"
 
-        logging.debug(f"Connecting to : {id}")
+        logger.debug(f"Connecting to : {id}")
 
         instr = rm.open_resource(id)
 
-        logging.debug(f"Connection: {instr}")
+        logger.debug(f"Connection: {instr}")
 
         # Configure the connection as required
         instr.baud_rate = baud_rate
@@ -463,7 +465,7 @@ and expects you to pass it {} arguments named {}.
         if wait_after_connect:
             time.sleep(wait_after_connect)
 
-        logging.debug('Device "{}" init complete'.format(id))
+        logger.debug('Device "{}" init complete'.format(id))
 
         return instr
 
