@@ -19,7 +19,7 @@ setup(
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     name="generic_scpi_driver",
-    url="http://gitlab.npl.co.uk/yourname/packagename",
+    url="https://github.com/charlesbaynham/GenericSCPIDriver",
     license="None",
     author="Charles Baynham",
     author_email="charles.baynham@npl.co.uk",

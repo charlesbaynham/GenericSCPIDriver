@@ -12,11 +12,12 @@ Installation
 
 Install your package and its dependancies by using::
 
-    pip install -e .
+    pip install git+https://github.com/charlesbaynham/GenericSCPIDriver
+
 
 If you'd like to use the ARTIQ network controller generation, instead install with::
 
-    pip install -e .[artiq]
+    pip install git+https://github.com/charlesbaynham/GenericSCPIDriver#[artiq]
 
 Usage
 -----
