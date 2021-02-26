@@ -246,6 +246,7 @@ class GenericDriver:
         This is stored in a shared namespace for this python session,
         so other GenericDrivers can access the same device in a thread-safe way, taking turns via @with_lock.
         """
+        logger.debug("Getting instrument object from _visa_sessions for device %s", self.dev_id)
         return _visa_sessions[self.dev_id]
 
     @classmethod
@@ -276,14 +277,14 @@ class GenericDriver:
         response_validator=None,
         args=[],
         coroutine=False,
-        docstring=None,
+        docstring=None
     ):
         """Make a function for this class which will access the device.
 
         Args:
             method_name (str): Name of the method to create
             device_command (str): Command to send to the device. Arguments can follow
-            response_parser (callable, optional): Function to pass the response to. Must return a string. Defaults to identity function.
+            response_parser (callable, optional): Function to pass the response to. Must return a string. If not provided, the device's response will not be read. 
             response_validator (callable, optional): Function to pass the response to before the parser. Can raise an error. Returns are ignored. Defaults to None.
             args (list, optional): List of arguments for the command, as ``GenericDriver.Arg`` objects. Defaults to [].
             coroutine (bool, optional): If true, create an async coroutine instead of a normal method, wrapping serial calls in a threaded executor. Defaults to False.
@@ -407,12 +408,19 @@ and expects you to pass it {} arguments named {}.
 
     def _flush_all_buffers(self):
         if not self.simulation:
+            logger.debug("Flushing visa interface with device %s", self.instr)
             self.instr.flush(
                 pyvisa.constants.VI_READ_BUF_DISCARD
                 | pyvisa.constants.VI_WRITE_BUF_DISCARD
                 | pyvisa.constants.VI_IO_IN_BUF_DISCARD
                 | pyvisa.constants.VI_IO_OUT_BUF_DISCARD
             )
+
+    def ping(self):
+        """
+        The all-important ping function, without which ARTIQ will brutally kill our controller.
+        """
+        return True
 
     @staticmethod
     def _setup_device(
