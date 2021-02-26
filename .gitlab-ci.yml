@@ -130,8 +130,11 @@ tox_slowtests:
 build:
   stage: Build Release
   script:
+    - pip install -e .
+    - pip install twine
     - python setup.py sdist
-    - mv dist/*.tar.gz build.tar.gz
+    - export TWINE_USERNAME=__token__
+    - twine upload dist/*
   artifacts:
     paths:
       - build.tar.gz
