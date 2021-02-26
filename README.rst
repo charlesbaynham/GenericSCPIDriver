@@ -10,14 +10,14 @@ if desired, a network ARTIQ controller is also generated.
 Installation
 ------------
 
-Install your package and its dependancies by using::
+Install the package and its dependancies with::
 
-    pip install git+https://github.com/charlesbaynham/GenericSCPIDriver
+    pip install generic-scpi-driver
 
 
 If you'd like to use the ARTIQ network controller generation, instead install with::
 
-    pip install git+https://github.com/charlesbaynham/GenericSCPIDriver#[artiq]
+    pip install generic-scpi-driver[artiq]
 
 Usage
 -----
