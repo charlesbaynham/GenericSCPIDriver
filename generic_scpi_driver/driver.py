@@ -246,7 +246,9 @@ class GenericDriver:
         This is stored in a shared namespace for this python session,
         so other GenericDrivers can access the same device in a thread-safe way, taking turns via @with_lock.
         """
-        logger.debug("Getting instrument object from _visa_sessions for device %s", self.dev_id)
+        logger.debug(
+            "Getting instrument object from _visa_sessions for device %s", self.dev_id
+        )
         return _visa_sessions[self.dev_id]
 
     @classmethod
@@ -277,14 +279,14 @@ class GenericDriver:
         response_validator=None,
         args=[],
         coroutine=False,
-        docstring=None
+        docstring=None,
     ):
         """Make a function for this class which will access the device.
 
         Args:
             method_name (str): Name of the method to create
             device_command (str): Command to send to the device. Arguments can follow
-            response_parser (callable, optional): Function to pass the response to. Must return a string. If not provided, the device's response will not be read. 
+            response_parser (callable, optional): Function to pass the response to. Must return a string. If not provided, the device's response will not be read.
             response_validator (callable, optional): Function to pass the response to before the parser. Can raise an error. Returns are ignored. Defaults to None.
             args (list, optional): List of arguments for the command, as ``GenericDriver.Arg`` objects. Defaults to [].
             coroutine (bool, optional): If true, create an async coroutine instead of a normal method, wrapping serial calls in a threaded executor. Defaults to False.
@@ -458,6 +460,14 @@ and expects you to pass it {} arguments named {}.
         logger.debug(f"Connection: {instr}")
 
         # Configure the connection as required
+
+        logger.debug(
+            "Setting up connection with baud %s, write_term %s and read_term %s",
+            baud_rate,
+            repr(write_termination),
+            repr(read_termination),
+        )
+
         instr.baud_rate = baud_rate
         if read_termination:
             instr.read_termination = read_termination
@@ -466,8 +476,8 @@ and expects you to pass it {} arguments named {}.
         if timeout:
             instr.timeout = timeout
         # instr.data_bits = 8
-        # instr.stop_bits = visa.constants.StopBits.one
-        # instr.parity = visa.constants.Parity.none
+        # instr.stop_bits = pyvisa.constants.StopBits.one
+        # instr.parity = pyvisa.constants.Parity.none
         # instr.flow_control = visa.constants.VI_ASRL_FLOW_NONE
 
         if wait_after_connect:
