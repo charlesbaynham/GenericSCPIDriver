@@ -1,4 +1,5 @@
-.. image:: https://img.shields.io/pypi/pyversions/generic-scpi-driver   :alt: PyPI - Python Version
+.. image:: https://img.shields.io/pypi/pyversions/generic-scpi-driver
+   :alt: PyPI - Python Version
 
 Generic SCPI driver
 ===================
