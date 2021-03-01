@@ -1,11 +1,12 @@
-<h1 align="center">
-    Generic SCPI driver
-</h1>
-<p align="center">
-    <a href="https://pypi.org/project/generic-scpi-driver/" alt="PyPI">
-        <img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/generic-scpi-driver">
-    </a>
-</p>
+.. raw:: html
+    <h1 align="center">
+        Generic SCPI driver
+    </h1>
+    <p align="center">
+        <a href="https://pypi.org/project/generic-scpi-driver/" alt="PyPI">
+            <img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/generic-scpi-driver">
+        </a>
+    </p>
 
 A generic driver generator for devices controlled via (virtual) COM ports using SCPI commands.
 Creates a python class for controlling your device. 
