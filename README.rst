@@ -170,7 +170,7 @@ at a time (only relevant in multi-threaded applications).
 
         @with_handler
         @with_lock
-        def do_complex_thing():
+        def do_complex_thing(self):
             '''Do something complex'''
             response = self.instr.query("COMP 1 2 3")
             return int(response) + 5
