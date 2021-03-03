@@ -119,6 +119,9 @@ If you'd prefer to process these, you can pass a ``response_parser`` function:
         response_parser=lambda x: x.split(","),
     )
 
+If your device doesn't give any response at all, you can set
+``response_parser=None`` and the driver won't attempt to listen for a respose. 
+
 Error checking
 ##############
 
