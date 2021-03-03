@@ -1,3 +1,4 @@
+import logging
 import argparse
 import asyncio
 
@@ -21,6 +22,8 @@ def get_controller_func(name, default_port, driver_class, driver_kwargs={}):
     """
 
     def main(extra_args=None):
+        logging.getLogger(name).info("Launching controller %s", name)
+
         def get_argparser():
             parser = argparse.ArgumentParser(
                 description="Generic controller for {}".format(name)
