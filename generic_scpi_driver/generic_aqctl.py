@@ -1,6 +1,6 @@
-import logging
 import argparse
 import asyncio
+import logging
 
 from sipyco import common_args
 from sipyco.pc_rpc import Server
