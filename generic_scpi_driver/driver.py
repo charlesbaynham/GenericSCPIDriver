@@ -205,7 +205,6 @@ class GenericDriver:
 
         # Claim this device exclusivly while we manipulate it
         with _locks[self.dev_id]:
-
             if simulation:
                 if not self.__class__._simulator_factory:
                     raise RuntimeError(
