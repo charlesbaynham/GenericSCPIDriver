@@ -306,20 +306,23 @@ class GenericDriver:
 
             cmd_string = self.command_separator.join([device_command] + arg_strings)
 
-            logger.debug("Sending command '%s'", cmd_string)
-
             self._flush_all_buffers()
 
             if response_parser:
+                logger.debug("Parser registered - sending query '%s'", cmd_string)
                 r = self.instr.query(cmd_string)
+
+                logger.debug("Received response: '%s'", r)
 
                 # Validate the response if available
                 if response_validator:
+                    logger.debug("Validating...")
                     response_validator(r)
 
                 # Return the parsed result
                 return response_parser(r)
             else:
+                logger.debug("No parser registered - sending command '%s'", cmd_string)
                 self.instr.write(cmd_string)
 
         async def func_async(self, *args):
