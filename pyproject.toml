@@ -25,5 +25,5 @@ black = "^23.9.1"
 sipyco = {git = "https://github.com/m-labs/sipyco.git"}
 
 [build-system]
-requires = ["poetry-core", "poetry"]
+requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
