@@ -57,18 +57,6 @@ black:
   allow_failure: true
   needs: []
 
-
-mypy:
-  image:
-    name: grktsh/mypy
-    entrypoint: [""]
-  stage: Static Analysis
-  script:
-    - mypy generic_scpi_driver
-  allow_failure: true
-  needs: []
-
-
 ### Tests ###
 
 pytest:
