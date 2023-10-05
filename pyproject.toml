@@ -3,7 +3,7 @@ name = "generic-scpi-driver"
 version = "1.4"
 description = "A generic template for creating python object-based drivers for SCPI hardware devices which communicate via VISA. Compatible with ARTIQ  installed with [artiq] modifier"
 authors = ["Charles Baynham <charles.baynham@gmail.com>"]
-readme = "README.md"
+readme = "README.rst"
 packages = [{include = "generic_scpi_driver"}]
 
 [tool.poetry.dependencies]
