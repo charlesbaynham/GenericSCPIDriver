@@ -42,10 +42,8 @@ cache:
     - git config --global user.email "test@example.com"
     # Make a virtual environment to install deps into (this will be cached for each step)
     - python --version
-    - pip install virtualenv
-    - virtualenv venv
-    - source venv/bin/activate
-    - pip install .[dev,artiq]
+    - pip install poetry
+    - poetry install
 
 ### Linting ###
 
@@ -73,66 +71,20 @@ mypy:
 
 ### Tests ###
 
-.tox:
+pytest:
   extends: .py_venv
   script:
-    - pwd
-    - ls -l
-    - export PYTHONPATH="$PYTHONPATH:."
-    - python -c "import sys;print(sys.path)"
-    - pip install tox
-    - tox
+    - poetry run pytest
+
   coverage: '/^TOTAL.+?(\d+\%)$/'
   needs: []
-
-tox-3.6:
-    extends: ".tox"
-    stage: "Test"
-    image: "python:3.6"
-
-tox-3.7:
-    extends: ".tox"
-    stage: "Test"
-    image: "python:3.7"
-
-tox-3.8:
-    extends: ".tox"
-    stage: "Test"
-    image: "python:3.8"
-  
-tox_slowtests:
-    extends: .py_venv
-    stage: "Test"
-    rules:
-      # Run for scheduled or triggered builds
-      - if: '$CI_PIPELINE_SOURCE == "trigger"'
-        when: always
-      - if: '$CI_PIPELINE_SOURCE == "schedule"'
-        when: always        
-      # Run for tags
-      - if: '$CI_COMMIT_TAG'
-        when: always
-      # And allow manual runs
-      - if: '$CI_COMMIT_BRANCH'
-        when: manual
-        allow_failure: true
-    script:
-      - pwd
-      - ls -l
-      - export PYTHONPATH="$PYTHONPATH:."
-      - python -c "import sys;print(sys.path)"
-      - pip install tox
-      - tox -- --runslow
-    coverage: '/^TOTAL.+?(\d+\%)$/'
-    needs: []
 
 ### Build for release if it's tagged ###
 build:
   stage: Build Release
   script:
-    - pip install -e .
     - pip install twine
-    - python setup.py sdist
+    - poetry build
     - export TWINE_USERNAME=__token__
     - twine upload dist/*
   artifacts:
@@ -151,7 +103,7 @@ pages:
   stage: Publish Pages
   needs: []
   script:
-    - sphinx-build docs public -b html
+    - poetry run sphinx-build docs public -b html
   artifacts:
     paths:
     - public
@@ -166,7 +118,7 @@ pdf_make:
   stage: Build Documentation
   needs: []
   script:
-    - sphinx-build docs latex -b latex
+    - poetry run sphinx-build docs latex -b latex
   
   artifacts:
     paths:
