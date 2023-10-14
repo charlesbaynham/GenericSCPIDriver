@@ -75,28 +75,28 @@ pages:
     - if: '$CI_COMMIT_BRANCH == "master"'
       when: always
   
-pdf_make:  
-  extends: .py_venv
-  stage: Build Documentation
-  needs: []
-  script:
-    - poetry run sphinx-build docs latex -b latex
+# pdf_make:  
+#   extends: .py_venv
+#   stage: Build Documentation
+#   needs: []
+#   script:
+#     - poetry run sphinx-build docs latex -b latex
   
-  artifacts:
-    paths:
-    - latex
-    expire_in: 1 hour
+#   artifacts:
+#     paths:
+#     - latex
+#     expire_in: 1 hour
     
-pdf_compile:
-  needs: ["pdf_make"]
-  stage: Compile Documentation
-  image:  charlesbaynham/ctanfull
-  artifacts:
-    paths:
-    - generic_scpi_driver.pdf
-    expose_as: "Manual"
-    name: ${CI_COMMIT_REF_SLUG}_manual.pdf
-  script:
-    - cd latex
-    - make
-    - cp generic_scpi_driver.pdf ../generic_scpi_driver.pdf
+# pdf_compile:
+#   needs: ["pdf_make"]
+#   stage: Compile Documentation
+#   image:  charlesbaynham/ctanfull
+#   artifacts:
+#     paths:
+#     - generic_scpi_driver.pdf
+#     expose_as: "Manual"
+#     name: ${CI_COMMIT_REF_SLUG}_manual.pdf
+#   script:
+#     - cd latex
+#     - make
+#     - cp generic_scpi_driver.pdf ../generic_scpi_driver.pdf
