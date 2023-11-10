@@ -14,6 +14,7 @@ from threading import RLock
 from types import FunctionType
 
 from .session import Session
+from .visa_session import VISASession
 
 
 logger = logging.getLogger("GenericSCPI")
@@ -83,8 +84,8 @@ class GenericDriver:
     :meth:`GenericDriver._register_query`.
     """
 
-    _session_factory: Callable[..., Session] = None
-    _simulator_factory: Optional[Callable[..., Session]] = None
+    session_factory: Callable[..., Session] = None
+    _simulator_factory: Optional[Callable[..., Session]] = VISASession
 
     def __init__(
         self,
@@ -144,7 +145,7 @@ class GenericDriver:
             else:
                 if self.dev_id not in _sessions:
                     # Pass all unrecognised keyword arguments to the session factory
-                    session = self.__class__._session_factory(
+                    session = self.__class__.session_factory(
                         id, baud_rate=baud_rate, **kwargs
                     )
                     session.flush()
