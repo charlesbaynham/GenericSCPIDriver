@@ -22,7 +22,7 @@ logger = logging.getLogger("GenericSCPI")
 # from typing import Callable, List, Tuple
 
 _locks = {}
-_visa_sessions = {}
+_sessions = {}
 
 
 def get_hwid_from_com_port(com_port):
@@ -165,30 +165,10 @@ class GenericDriver:
         self.command_separator = command_separator
         self.simulation = simulation
 
-        # ID of the device that this driver controls
         if not id:
             raise ValueError("You must pass an id")
-        try:
-            self.id = get_com_port_by_hwid(id)
-            if self.id.lower() == id.lower():
-                logger.warning(
-                    (
-                        "Initiated device from COM port: it would be more "
-                        'robust to use the HWID instead. For "%s", that\'s "%s"'
-                    ),
-                    self.id,
-                    get_hwid_from_com_port(self.id),
-                )
-        except RuntimeError as e:
-            if simulation:
-                # Simulation mode, so don't worry about a missing device
-                self.id = id
-            else:
-                raise e
 
-        logger.debug("Found device %s on COM port %s", id, self.id)
-
-        self.dev_id = str(self.__class__) + self.id
+        self.dev_id = str(self.__class__) + id
         if simulation:
             self.dev_id += "Sim"
 
@@ -210,13 +190,13 @@ class GenericDriver:
                     raise RuntimeError(
                         "Simulation mode is not available: you must first call _register_simulator"
                     )
-                if self.dev_id not in _visa_sessions:
-                    _visa_sessions[self.dev_id] = self.__class__._simulator_factory()
+                if self.dev_id not in _sessions:
+                    _sessions[self.dev_id] = self.__class__._simulator_factory()
             else:
-                if self.dev_id not in _visa_sessions:
+                if self.dev_id not in _sessions:
                     # Pass all unrecognised keyword arguments to _setup_device
-                    _visa_sessions[self.dev_id] = self._setup_device(
-                        self.id, baud_rate=baud_rate, **kwargs
+                    _sessions[self.dev_id] = self._setup_device(
+                        id, baud_rate=baud_rate, **kwargs
                     )
                     self._flush_all_buffers()
 
@@ -235,7 +215,7 @@ class GenericDriver:
         logger.warning("Closing VISA connection to device %s", self.dev_id)
         self.instr.close()
         del _locks[self.dev_id]
-        del _visa_sessions[self.dev_id]
+        del _sessions[self.dev_id]
 
     @property
     def instr(self):
@@ -248,7 +228,7 @@ class GenericDriver:
         logger.debug(
             "Getting instrument object from _visa_sessions for device %s", self.dev_id
         )
-        return _visa_sessions[self.dev_id]
+        return _sessions[self.dev_id]
 
     @classmethod
     def _register_simulator(cls, simulator_factory):
@@ -442,19 +422,33 @@ and expects you to pass it {} arguments named {}.
 
         :rtype: :class:pyvisa.resources.Resource
         """
+        id_resolved = get_com_port_by_hwid(id)
+
+        if id_resolved.lower() == id.lower():
+            logger.warning(
+                (
+                    "Initiated device from COM port: it would be more "
+                    'robust to use the HWID instead. For "%s", that\'s "%s"'
+                ),
+                id,
+                id_resolved,
+            )
+
+        logger.debug("Found device %s on COM port %s", id, id_resolved)
+
         # Get a handle to the instrument
         rm = pyvisa.ResourceManager("@py")
 
         logger.debug(f"Devices: {rm.list_resources()}")
 
         # pyvisa-py doesn't have "COM" aliases for ASRL serial ports, so convert
-        regex_match = re.match(r"^com(\d{1,3})$", id.lower())
+        regex_match = re.match(r"^com(\d{1,3})$", id_resolved.lower())
         if regex_match:
-            id = f"ASRL{regex_match[1]}"
+            id_resolved = f"ASRL{regex_match[1]}"
 
-        logger.debug(f"Connecting to : {id}")
+        logger.debug(f"Connecting to : {id_resolved}")
 
-        instr = rm.open_resource(id)
+        instr = rm.open_resource(id_resolved)
 
         logger.debug(f"Connection: {instr}")
 
