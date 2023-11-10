@@ -1,10 +1,11 @@
-from .session import Session
 import logging
-
-import pyvisa
 import re
 import time
+
+import pyvisa
 from serial.tools.list_ports import grep as grep_serial_ports
+
+from .session import Session
 
 logger = logging.getLogger(__name__)
 

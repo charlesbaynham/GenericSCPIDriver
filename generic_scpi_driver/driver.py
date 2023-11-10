@@ -7,13 +7,13 @@ This module can be used to generate a driver for a device which communicates wit
 import asyncio
 import logging
 import re
-
 from collections import namedtuple
 from functools import partial
-from .session import Session
 from functools import wraps
 from threading import RLock
 from types import FunctionType
+
+from .session import Session
 
 
 logger = logging.getLogger("GenericSCPI")
@@ -73,10 +73,10 @@ class GenericDriver:
     Template for devices which communicate by sending / receiving text commands.
     This class should be inherited by your driver.
 
-    You can register new commands by calling :meth:`GenericDriver._register_query`. This will create a
-    method on the class which queries your device returns the response. The
-    class builder supports input and output validation as well as custom error
-    handling.
+    You can register new commands by calling
+    :meth:`GenericDriver._register_query`. This will create a method on the
+    class which queries your device returns the response. The class builder
+    supports input and output validation as well as custom error handling.
 
     If you need more advanced logic in your driver, you can still just add
     methods as normal. They'll work side-by-side with methods registered by
