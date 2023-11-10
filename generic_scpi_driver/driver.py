@@ -84,8 +84,8 @@ class GenericDriver:
     :meth:`GenericDriver._register_query`.
     """
 
-    session_factory: Callable[..., Session] = None
-    _simulator_factory: Optional[Callable[..., Session]] = VISASession
+    session_factory: Callable[..., Session] = VISASession
+    _simulator_factory: Optional[Callable[..., Session]] = None
 
     def __init__(
         self,
