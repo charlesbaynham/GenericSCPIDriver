@@ -33,7 +33,7 @@ def with_lock(f):
     """
 
     @wraps(f)
-    def wrapped(self, *args, **kw):
+    def wrapped(self: "GenericDriver", *args, **kw):
         with _locks[self.dev_id]:
             return f(self, *args, **kw)
 
@@ -52,11 +52,11 @@ def with_handler(f):
     """
 
     @wraps(f)
-    def wrapped(self, *args, **kw):
+    def wrapped(self: "GenericDriver", *args, **kw):
         try:
             return f(self, *args, **kw)
         except Exception:
-            self._flush_all_buffers()
+            self.instr.flush()
 
             raise
 
@@ -238,7 +238,7 @@ class GenericDriver:
 
             logger.debug("Sending command '%s'", cmd_string)
 
-            self._flush_all_buffers()
+            self.instr.flush()
 
             if response_parser:
                 r = self.instr.query(cmd_string)
