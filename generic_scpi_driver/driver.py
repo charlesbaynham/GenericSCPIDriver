@@ -135,16 +135,18 @@ class GenericDriver:
         # Claim this device exclusivly while we manipulate it
         with _locks[self.dev_id]:
             if simulation:
-                if not self._simulator_factory:
+                if not self.__class__._simulator_factory:
                     raise RuntimeError(
                         "Simulation mode is not available: you must first call _register_simulator"
                     )
                 if self.dev_id not in _sessions:
-                    _sessions[self.dev_id] = self._simulator_factory()
+                    _sessions[self.dev_id] = self.__class__._simulator_factory()
             else:
                 if self.dev_id not in _sessions:
                     # Pass all unrecognised keyword arguments to the session factory
-                    session = self._session_factory(id, baud_rate=baud_rate, **kwargs)
+                    session = self.__class__._session_factory(
+                        id, baud_rate=baud_rate, **kwargs
+                    )
                     session.flush()
 
                     _sessions[self.dev_id] = session
