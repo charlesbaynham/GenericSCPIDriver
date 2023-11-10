@@ -7,14 +7,14 @@ This module can be used to generate a driver for a device which communicates wit
 import asyncio
 import logging
 import re
-import time
+
 from collections import namedtuple
 from functools import partial
 from .session import Session
 from functools import wraps
 from threading import RLock
 from types import FunctionType
-import pyvisa
+
 
 logger = logging.getLogger("GenericSCPI")
 
