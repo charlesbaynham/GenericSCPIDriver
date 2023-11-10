@@ -220,7 +220,7 @@ class GenericDriver:
     @property
     def instr(self):
         """
-        Get the VISA session for this device.
+        Get the session for this device.
 
         This is stored in a shared namespace for this python session,
         so other GenericDrivers can access the same device in a thread-safe way, taking turns via @with_lock.
@@ -278,7 +278,7 @@ class GenericDriver:
         # already present because we will call it from a wrapper
         @with_lock
         @with_handler
-        def func(self, *args):
+        def func(self: GenericDriver, *args):
             arg_strings = []
             for arg, registered_arg in zip(args, registered_args):
                 arg_strings.append(registered_arg.validator(arg))
