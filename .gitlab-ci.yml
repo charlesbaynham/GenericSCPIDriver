@@ -13,6 +13,7 @@ stages:
 .py_venv:
   before_script:
     # Make a virtual environment to install deps into (this will be cached for each step)
+    - export
     - python --version
     - pip install poetry
     - poetry install
@@ -48,7 +49,7 @@ build:
     - pip install twine
     - poetry build
     - export TWINE_USERNAME=__token__
-    - twine upload dist/*
+    - twine upload dist/* --verbose
   artifacts:
     paths:
       - build.tar.gz

@@ -7,4 +7,4 @@ from .generic_aqctl import get_controller_func
 
 __author__ = "Charles Baynham <charles.baynham@npl.co.uk>"
 __all__ = ["GenericDriver", "with_handler", "with_lock", "get_controller_func"]
-__version__ = "1.5.1"
+__version__ = "1.5.2"
