@@ -4,6 +4,7 @@ interface, using VISA communications
 
 This module can be used to generate a driver for a device which communicates with simple SCPI commands.
 """
+
 import asyncio
 import logging
 import re
