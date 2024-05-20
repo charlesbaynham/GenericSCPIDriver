@@ -164,7 +164,7 @@ class GenericDriver:
 
         After this method is called, no other methods will work and this object should be discarded.
         """
-        logger.info("Closing connection to device %s", self.dev_id)
+        logger.debug("Closing connection to device %s", self.dev_id)
         self.instr.close()
         del _locks[self.dev_id]
         del _sessions[self.dev_id]
