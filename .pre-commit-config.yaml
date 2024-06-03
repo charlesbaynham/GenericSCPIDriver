@@ -2,13 +2,13 @@
 repos:
   # Sort python imports
   - repo: https://github.com/asottile/reorder-python-imports
-    rev: v3.12.0
+    rev: v3.13.0
     hooks:
     - id: reorder-python-imports
     
     
   # Format the code with a conventional PEP8 style
   - repo: https://github.com/psf/black
-    rev: "23.12.0"
+    rev: "24.4.2"
     hooks:
       - id: black
