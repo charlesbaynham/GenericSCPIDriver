@@ -6,15 +6,6 @@ from unittest.mock import patch, MagicMock
 from generic_scpi_driver.generic_aqctl import get_controller_func
 
 
-# Mock classes and functions
-class MockDriver:
-    def __init__(self, *args, **kwargs):
-        pass
-
-    def close(self):
-        pass
-
-
 @pytest.fixture
 def mock_server():
     with patch("generic_scpi_driver.generic_aqctl.Server") as MockServer:
@@ -32,8 +23,10 @@ def mock_event_loop():
 def test_main(mock_server, mock_event_loop):
     name = "test_controller"
     default_port = 1234
-    driver_class = MockDriver
     driver_kwargs = {}
+
+    driver_class = MagicMock()
+    driver_class.__name__ = "TestDriver"
 
     def mock_extra_arg_processor(parser):
         parser.add_argument("--extra", type=str, help="Extra argument")
@@ -65,5 +58,8 @@ def test_main(mock_server, mock_event_loop):
             )
 
             mock_server.assert_called()
+            driver_class.assert_called_with(
+                None, id="test_id", simulation=True, extra="extra_value"
+            )
             mock_event_loop.return_value.run_until_complete.assert_called()
             mock_event_loop.return_value.close.assert_called()
