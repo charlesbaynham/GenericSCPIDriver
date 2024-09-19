@@ -21,7 +21,7 @@ def get_controller_func(name, default_port, driver_class, driver_kwargs={}):
         function: A function to launch the controller
     """
 
-    def main(extra_args=None):
+    def main():
         logging.getLogger(name).info("Launching controller %s", name)
 
         def get_argparser():
@@ -45,7 +45,7 @@ def get_controller_func(name, default_port, driver_class, driver_kwargs={}):
 
             return parser
 
-        args = get_argparser().parse_args(extra_args)
+        args = get_argparser().parse_args()
         common_args.init_logger_from_args(args)
 
         driver_obj = driver_class(
