@@ -1,4 +1,4 @@
-import typing 
+import typing
 import argparse
 import asyncio
 import logging
@@ -7,7 +7,9 @@ from sipyco import common_args
 from sipyco.pc_rpc import Server
 
 
-def get_controller_func(name, default_port, driver_class, driver_kwargs={}, extra_arg_processor = lambda _: []):
+def get_controller_func(
+    name, default_port, driver_class, driver_kwargs={}, extra_arg_processor=lambda _: []
+):
     """
     Generate a function which will launch an ARTIQ controller for the provided class
 
@@ -23,7 +25,6 @@ def get_controller_func(name, default_port, driver_class, driver_kwargs={}, extr
         function: The main function for the controller.
     """
 
-    
     def main():
         logging.getLogger(name).info("Launching controller %s", name)
 
@@ -49,10 +50,10 @@ def get_controller_func(name, default_port, driver_class, driver_kwargs={}, extr
             return parser
 
         args_parser = get_argparser()
-        
+
         # Call the extra arg processor to add any extra arguments to the command
         # line. This will return a list of the arguments which were added
-        extra_args = extra_arg_processor(args)
+        extra_args = extra_arg_processor(args_parser)
 
         args = args_parser.parse_args()
         common_args.init_logger_from_args(args)
@@ -60,10 +61,10 @@ def get_controller_func(name, default_port, driver_class, driver_kwargs={}, extr
         extra_arg_values = {k: getattr(k, args) for k in extra_args}
 
         # Merge driver_kwargs and extra_arg_values
-        driver_kwargs = {**driver_kwargs, **extra_arg_values}
+        merged_kwargs = {**driver_kwargs, **extra_arg_values}
 
         driver_obj = driver_class(
-            None, id=args.id, simulation=args.simulation, **driver_kwargs
+            None, id=args.id, simulation=args.simulation, **merged_kwargs
         )
 
         loop = asyncio.get_event_loop()
