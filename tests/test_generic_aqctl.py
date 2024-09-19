@@ -15,11 +15,6 @@ class MockDriver:
         pass
 
 
-def mock_extra_arg_processor(parser):
-    parser.add_argument("--extra", type=str, help="Extra argument")
-    return ["extra"]
-
-
 @pytest.fixture
 def mock_server():
     with patch("generic_scpi_driver.generic_aqctl.Server") as MockServer:
@@ -48,14 +43,14 @@ def test_main(mock_server, mock_event_loop, mock_common_args):
     name = "test_controller"
     default_port = 1234
     driver_class = MockDriver
-    driver_kwargs = {"param1": "value1"}
+    driver_kwargs = {}
+
+    def mock_extra_arg_processor(parser):
+        parser.add_argument("--extra", type=str, help="Extra argument")
+        return ["extra"]
 
     main_func = get_controller_func(
-        name,
-        default_port,
-        driver_class,
-        driver_kwargs,
-        # name, default_port, driver_class, driver_kwargs, mock_extra_arg_processor FIXME
+        name, default_port, driver_class, driver_kwargs, mock_extra_arg_processor
     )
 
     test_args = [
@@ -65,8 +60,8 @@ def test_main(mock_server, mock_event_loop, mock_common_args):
         "--simulation",
         # "--port",
         # "5678",
-        # "--extra",
-        # "extra_value",
+        "--extra",
+        "extra_value",
     ]
 
     with patch("sys.argv", test_args):

@@ -58,7 +58,7 @@ def get_controller_func(
         args = args_parser.parse_args()
         common_args.init_logger_from_args(args)
 
-        extra_arg_values = {k: getattr(k, args) for k in extra_args}
+        extra_arg_values = {k: getattr(args, k) for k in extra_args}
 
         # Merge driver_kwargs and extra_arg_values
         merged_kwargs = {**driver_kwargs, **extra_arg_values}
