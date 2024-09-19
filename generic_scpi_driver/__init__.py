@@ -1,5 +1,4 @@
 """generic_scpi_driver - A generic template for creating python object-based drivers for SCPI hardware devices which communicate via VISA. Compatible with ARTIQ. """
-
 from .driver import GenericDriver
 from .driver import with_handler
 from .driver import with_lock

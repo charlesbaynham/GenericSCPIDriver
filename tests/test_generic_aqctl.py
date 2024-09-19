@@ -1,8 +1,11 @@
-import pytest
 import argparse
 import asyncio
 import logging
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
+from unittest.mock import patch
+
+import pytest
+
 from generic_scpi_driver.generic_aqctl import get_controller_func
 
 
