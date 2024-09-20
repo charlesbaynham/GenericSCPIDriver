@@ -1,27 +1,31 @@
 import argparse
 import asyncio
 import logging
+import typing
 
 from sipyco import common_args
 from sipyco.pc_rpc import Server
 
 
-def get_controller_func(name, default_port, driver_class, driver_kwargs={}):
-    """Generate a function which will launch an ARTIQ controller for the provided class
+def get_controller_func(
+    name, default_port, driver_class, driver_kwargs={}, extra_arg_processor=lambda _: []
+):
+    """
+    Generate a function which will launch an ARTIQ controller for the provided class
 
     The generated controller will only accept "--id" and "--simulation" command-line parameters.
 
     Args:
-        name (str): Name of the controller to launch
-        default_port (int): Default port if not provided
-        driver_class (object): Driver class. Probably a GenericDriver, but not required to be
-        driver_kwargs (dict): Additional arguments to pass to the driver object constuctor
-
+        name (str): The name of the controller.
+        default_port (int): The default port number for the controller.
+        driver_class (type): The class of the driver to be used.
+        driver_kwargs (dict, optional): Additional keyword arguments to pass to the driver class. Defaults to {}.
+        extra_arg_processor (function, optional): Function that will be called and passed the ArgumentParser so that extra arguments can be added to the command line. Must return a list of strings of the names of the parameters added. . Defaults to a lambda that returns an empty list.
     Returns:
-        function: A function to launch the controller
+        function: The main function for the controller.
     """
 
-    def main(extra_args=None):
+    def main():
         logging.getLogger(name).info("Launching controller %s", name)
 
         def get_argparser():
@@ -45,11 +49,22 @@ def get_controller_func(name, default_port, driver_class, driver_kwargs={}):
 
             return parser
 
-        args = get_argparser().parse_args(extra_args)
+        args_parser = get_argparser()
+
+        # Call the extra arg processor to add any extra arguments to the command
+        # line. This will return a list of the arguments which were added
+        extra_args = extra_arg_processor(args_parser)
+
+        args = args_parser.parse_args()
         common_args.init_logger_from_args(args)
 
+        extra_arg_values = {k: getattr(args, k) for k in extra_args}
+
+        # Merge driver_kwargs and extra_arg_values
+        merged_kwargs = {**driver_kwargs, **extra_arg_values}
+
         driver_obj = driver_class(
-            None, id=args.id, simulation=args.simulation, **driver_kwargs
+            None, id=args.id, simulation=args.simulation, **merged_kwargs
         )
 
         loop = asyncio.get_event_loop()
