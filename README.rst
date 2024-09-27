@@ -5,10 +5,10 @@ Generic SCPI driver
    :alt: PyPI - Python Version
 
 A generic driver generator for devices controlled via (virtual) COM ports using SCPI commands.
-Creates a python class for controlling your device. 
+Creates a python class for controlling your device.
 
 This class is compatible with the ARTIQ experimental control system and,
-if desired, a network ARTIQ controller is also generated. 
+if desired, a network ARTIQ controller is also generated.
 
 Installation
 ------------
@@ -102,7 +102,7 @@ single parameter and must return a string to be sent to the device, or throw an 
 Return values
 #############
 
-Return values are, by default, the string returned by the SCPI device in response to your command. 
+Return values are, by default, the string returned by the SCPI device in response to your command.
 If you'd prefer to process these, you can pass a ``response_parser`` function:
 
 .. code-block:: python
@@ -120,7 +120,7 @@ If you'd prefer to process these, you can pass a ``response_parser`` function:
     )
 
 If your device doesn't give any response at all, you can set
-``response_parser=None`` and the driver won't attempt to listen for a respose. 
+``response_parser=None`` and the driver won't attempt to listen for a respose.
 
 Error checking
 ##############
@@ -136,7 +136,7 @@ an exception if needed. E.g.
     def check_for_error(s):
         if "error" in s.lower():
             raise RuntimeError("Error returned by device: {}".format(s))
-    
+
     SimpleDriver._register_query(
         "do_something",
         "DOOO",
@@ -146,11 +146,11 @@ an exception if needed. E.g.
 Asyncronous operation
 #####################
 
-By default, all methods are syncronous. If you'd prefer async operation, pass ``coroutine=True`` 
+By default, all methods are syncronous. If you'd prefer async operation, pass ``coroutine=True``
 to ``_register_query``. This creates a new thread for the serial call and returns an ``asyncio``
 coroutine. Note that you have to call these using an async loop which is a whole topic of python
 programming. This is particularly useful for ARTIQ drivers, since ARTIQ handles coroutines
-automatically. 
+automatically.
 
 Custom methods
 ##############
@@ -159,7 +159,7 @@ The method generation is intended to be quite flexible, but if you really need c
 nothing to stop you writing your own methods. You can use ``self.instr`` to access the
 ``pyvisa.Resource`` for your device. Use the wrappers ``with_handler`` to cause the driver to issue a
 VISA ``.flush()`` if an error occurs and ``with_lock`` to ensure that only one method access the device
-at a time (only relevant in multi-threaded applications). 
+at a time (only relevant in multi-threaded applications).
 
 .. code-block:: python
 
@@ -257,7 +257,7 @@ Register this ``main`` function in your ``setup.py`` like so:
     )
 
 After installing your package using `pip install -e .` as normal, you should be able to call
-``artiq_simple_device`` on the command line to launch a controller for your device. 
+``artiq_simple_device`` on the command line to launch a controller for your device.
 
 Development
 -----------

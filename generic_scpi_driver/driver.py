@@ -4,6 +4,7 @@ interface, using VISA communications
 
 This module can be used to generate a driver for a device which communicates with simple SCPI commands.
 """
+
 import asyncio
 import logging
 import re
@@ -16,10 +17,10 @@ from types import FunctionType
 from .session import Session
 from .visa_session import VISASession
 
-
 logger = logging.getLogger("GenericSCPI")
 
-from typing import Callable, Optional
+from typing import Callable
+from typing import Optional
 
 _locks = {}
 _sessions = {}
@@ -337,7 +338,6 @@ and expects you to pass it {} arguments named {}.
         Returns:
             None
         """
-        pass
 
     def ping(self):
         """
