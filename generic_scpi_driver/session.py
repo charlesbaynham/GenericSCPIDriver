@@ -28,7 +28,6 @@ class Session:
         If your Session does not require this functionality, don't implement
         this function.
         """
-        pass
 
     def close(self) -> None:
         """
