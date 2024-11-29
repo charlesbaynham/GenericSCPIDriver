@@ -3,8 +3,18 @@
 from .driver import GenericDriver
 from .driver import with_handler
 from .driver import with_lock
-from .generic_aqctl import get_controller_func
+
 
 __author__ = "Charles Baynham <charles.baynham@npl.co.uk>"
-__all__ = ["GenericDriver", "with_handler", "with_lock", "get_controller_func"]
+
+__all__ = ["GenericDriver", "with_handler", "with_lock"]
 __version__ = "1.6"
+
+
+try:
+    from .generic_aqctl import get_controller_func
+
+    __all__.append("get_controller_func")
+except ImportError:
+    # sipyco is not installed
+    pass
