@@ -8,7 +8,7 @@ from .driver import with_lock
 __author__ = "Charles Baynham <charles.baynham@npl.co.uk>"
 
 __all__ = ["GenericDriver", "with_handler", "with_lock"]
-__version__ = "1.6"
+__version__ = "1.6.1"
 
 
 try:
