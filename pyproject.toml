@@ -1,10 +1,10 @@
 [tool.poetry]
 name = "generic-scpi-driver"
-version = "1.6"
+version = "1.6.1"
 description = "A generic template for creating python object-based drivers for SCPI hardware devices which communicate via VISA. Compatible with ARTIQ  installed with [artiq] modifier"
 authors = ["Charles Baynham <charles.baynham@gmail.com>"]
 readme = "README.rst"
-packages = [{include = "generic_scpi_driver"}]
+packages = [{ include = "generic_scpi_driver" }]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.13"
@@ -22,7 +22,7 @@ black = "^23.9.1"
 
 [tool.poetry.group.artiq.dependencies]
 numpy = ">1.0"
-sipyco = {git = "https://github.com/m-labs/sipyco.git"}
+sipyco = { git = "https://github.com/m-labs/sipyco.git" }
 
 [build-system]
 requires = ["poetry-core"]
