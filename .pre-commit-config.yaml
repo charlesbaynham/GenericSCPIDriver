@@ -1,7 +1,7 @@
 repos:
   # Several generic fixes
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.6.0
+  rev: v5.0.0
   hooks:
   - id: trailing-whitespace
   - id: check-merge-conflict
@@ -12,14 +12,14 @@ repos:
 
 # Sort python imports
 - repo: https://github.com/PyCQA/isort
-  rev: 5.13.2
+  rev: 6.0.0
   hooks:
   - id: isort
     args: [--profile, black, --force-single-line-imports]
 
 # Format the code with a conventional PEP8 style
 - repo: https://github.com/psf/black
-  rev: 24.8.0
+  rev: 25.1.0
   hooks:
   - id: black
 
