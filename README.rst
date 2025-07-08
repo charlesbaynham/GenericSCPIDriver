@@ -79,8 +79,10 @@ This would allow you to call:
     # ...or keyword arguments
     dev.set_voltage(channel=0, voltage=5.4)
 
-Parameters can be validated by passing a custom function (which may accept any
-single parameter and must return a string to be sent to the device, or throw an error):
+Parameters can be validated by passing a custom function. This must accept a
+single parameter (of any type) and should return a string to be sent to the
+device, or throw an error. If you do not return a string, this library will
+attempt to cast your response to a string anyway. 
 
 .. code-block:: python
 

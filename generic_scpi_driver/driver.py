@@ -234,7 +234,7 @@ class GenericDriver:
         def func(self: GenericDriver, *args):
             arg_strings = []
             for arg, registered_arg in zip(args, registered_args):
-                arg_strings.append(registered_arg.validator(arg))
+                arg_strings.append(str(registered_arg.validator(arg)))
 
             cmd_string = self.command_separator.join([device_command] + arg_strings)
 
