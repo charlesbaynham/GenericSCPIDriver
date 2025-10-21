@@ -43,16 +43,6 @@ black:
   coverage: /^TOTAL.+?(\d+\%)$/
   needs: []
 
-pytest-py8:
-  extends: .pytest
-  image:
-    name: python:3.8
-
-pytest-py9:
-  extends: .pytest
-  image:
-    name: python:3.9
-
 pytest-py10:
   extends: .pytest
   image:
