@@ -16,6 +16,8 @@ stages:
     - export
     - python --version
     - pip install poetry
+    # Update all dependencies as if being installed from PyPI
+    - poetry update --lock
     - poetry install
 
 ### Linting ###
