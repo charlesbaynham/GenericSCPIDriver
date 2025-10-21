@@ -2,8 +2,13 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
+import sys
 
 from generic_scpi_driver.generic_aqctl import get_controller_func
+
+
+if not (sys.version_info.major == 3 and sys.version_info.minor >= 10):
+    pytest.skip("requires python >=3.10", allow_module_level=True)
 
 
 @pytest.fixture
