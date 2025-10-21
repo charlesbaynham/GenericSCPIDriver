@@ -7,7 +7,7 @@ readme = "README.rst"
 packages = [{ include = "generic_scpi_driver" }]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.13"
+python = ">=3.8,<4.0"
 pyvisa = "^1"
 pyserial = "^3"
 pyvisa-py = "^0.7.0"
