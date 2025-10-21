@@ -2,41 +2,41 @@
 image: python:3.8
 
 stages:
-- Build Documentation
-- Compile Documentation
-- Static Analysis
-- Test
-- Build Release
-- Publish Pages
+  - Build Documentation
+  - Compile Documentation
+  - Static Analysis
+  - Test
+  - Build Release
+  - Publish Pages
 
 # Make a template for steps that use a python virtual env
 .py_venv:
   before_script:
     # Make a virtual environment to install deps into (this will be cached for each step)
-  - export
-  - python --version
-  - pip install poetry
-  - poetry install
+    - export
+    - python --version
+    - pip install poetry
+    - poetry install
 
 ### Linting ###
 
 black:
   image:
     name: cytopia/black
-    entrypoint: ['']
+    entrypoint: [""]
   stage: Static Analysis
   script:
-  - black --check generic_scpi_driver
+    - black --check generic_scpi_driver
   allow_failure: true
   needs: []
 
 ### Tests ###
 
-pytest:
+.pytest:
   extends: .py_venv
   stage: Test
   script:
-  - poetry run pytest
+    - poetry run pytest
 
   coverage: /^TOTAL.+?(\d+\%)$/
   needs: []
@@ -46,17 +46,17 @@ build:
   stage: Build Release
   extends: .py_venv
   script:
-  - pip install twine
-  - poetry build
-  - export TWINE_USERNAME=__token__
-  - twine upload dist/* --verbose
+    - pip install twine
+    - poetry build
+    - export TWINE_USERNAME=__token__
+    - twine upload dist/* --verbose
   artifacts:
     paths:
-    - build.tar.gz
+      - build.tar.gz
     expire_in: 1000 yrs
   rules:
-  - if: $CI_COMMIT_TAG
-    when: always
+    - if: $CI_COMMIT_TAG
+      when: always
 
 ### Documentation ###
 
@@ -66,16 +66,15 @@ pages:
   stage: Publish Pages
   needs: []
   script:
-  - poetry run sphinx-build docs public -b html
+    - poetry run sphinx-build docs public -b html
   artifacts:
     paths:
-    - public
+      - public
   rules:
-  - if: $CI_COMMIT_TAG
-    when: always
-  - if: $CI_COMMIT_BRANCH == "master"
-    when: always
-
+    - if: $CI_COMMIT_TAG
+      when: always
+    - if: $CI_COMMIT_BRANCH == "master"
+      when: always
 # pdf_make:
 #   extends: .py_venv
 #   stage: Build Documentation
