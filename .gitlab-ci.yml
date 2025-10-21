@@ -41,6 +41,36 @@ black:
   coverage: /^TOTAL.+?(\d+\%)$/
   needs: []
 
+pytest-py8:
+  extends: .pytest
+  image:
+    name: python:3.8
+
+pytest-py9:
+  extends: .pytest
+  image:
+    name: python:3.9
+
+pytest-py10:
+  extends: .pytest
+  image:
+    name: python:3.10
+
+pytest-py11:
+  extends: .pytest
+  image:
+    name: python:3.11
+
+pytest-py12:
+  extends: .pytest
+  image:
+    name: python:3.12
+
+pytest-py13:
+  extends: .pytest
+  image:
+    name: python:3.13
+
 ### Build for release if it's tagged ###
 build:
   stage: Build Release
