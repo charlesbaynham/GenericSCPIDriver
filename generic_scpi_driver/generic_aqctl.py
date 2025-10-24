@@ -7,7 +7,7 @@ from sipyco.pc_rpc import Server
 
 
 def get_controller_func(
-    name, default_port, driver_class, driver_kwargs={}, extra_arg_processor=lambda _: []
+    name, default_port, driver_class, driver_kwargs={}, extra_arg_processor=lambda _: [], allow_parallel=True
 ):
     """
     Generate a function which will launch an ARTIQ controller for the provided class
@@ -20,6 +20,7 @@ def get_controller_func(
         driver_class (type): The class of the driver to be used.
         driver_kwargs (dict, optional): Additional keyword arguments to pass to the driver class. Defaults to {}.
         extra_arg_processor (function, optional): Function that will be called and passed the ArgumentParser so that extra arguments can be added to the command line. Must return a list of strings of the names of the parameters added. . Defaults to a lambda that returns an empty list.
+        allow_parallel (bool, optional): Whether to allow parallel connections to the driver. Defaults to True.
     Returns:
         function: The main function for the controller.
     """
@@ -83,7 +84,7 @@ def get_controller_func(
                 driver_class.__name__
             ),
             builtin_terminate=True,
-            allow_parallel=True,
+            allow_parallel=allow_parallel,
         )
 
         loop.run_until_complete(
