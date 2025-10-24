@@ -74,10 +74,6 @@ def get_controller_func(
         # Allow parallel connections so that functions which don't touch the
         # serial device can be done simultaneously: functions which do are
         # protected by @with_lock.
-        #
-        # TODO: This causes a bug! ARTIQ uses asyncio for its parallelism and
-        # RLocks only work between threads. So this allows multiple commands to
-        # access the device at once if they are async functions
         server = Server(
             {name: driver_obj},
             description="An automatically generated server for {}".format(

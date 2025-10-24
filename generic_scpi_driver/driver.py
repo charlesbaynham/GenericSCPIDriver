@@ -11,7 +11,7 @@ import re
 from collections import namedtuple
 from functools import partial
 from functools import wraps
-from threading import RLock
+
 from types import FunctionType
 
 from .session import Session
@@ -22,22 +22,26 @@ logger = logging.getLogger("GenericSCPI")
 from typing import Callable
 from typing import Optional
 
-_locks = {}
+_locks : dict[str,asyncio.Lock]= {}
 _sessions = {}
 
 
 def with_lock(f):
     """
-    Decorator to cause a function to acquire an RLock for this id before it runs.
+    Decorator to cause a function to acquire an Lock for this id before it runs.
 
-    RLocks are stored in the namespace of the class whose function is being decorated.
+    Locks are stored in the namespace of the class whose function is being decorated.
     Note that this decorator must be applied to a class method
     """
 
     @wraps(f)
     def wrapped(self: "GenericDriver", *args, **kw):
-        with _locks[self.dev_id]:
+        lock = _locks[self.dev_id]
+        lock.acquire()
+        try:
             return f(self, *args, **kw)
+        finally:
+            lock.release()
 
     wrapped.__name__ = f.__name__
     wrapped.__doc__ = f.__doc__
@@ -130,12 +134,14 @@ class GenericDriver:
         # Create a Lock for this resource if it doesn't already exist. This lives
         # in the namespace of this module and so is common across all Drivers,
         # just in case you make multiple drivers pointing to the same device for
-        # some reason
+        # some reason``
         if self.dev_id not in _locks:
-            _locks[self.dev_id] = RLock()
+            _locks[self.dev_id] = asyncio.Lock()
 
         # Claim this device exclusivly while we manipulate it
-        with _locks[self.dev_id]:
+        lock = _locks[self.dev_id]
+        lock.acquire()
+        try:
             if simulation:
                 if not self.__class__._simulator_factory:
                     raise RuntimeError(
@@ -152,6 +158,8 @@ class GenericDriver:
                     session.flush()
 
                     _sessions[self.dev_id] = session
+        finally:
+            lock.release()
 
         self.check_connection()
 
