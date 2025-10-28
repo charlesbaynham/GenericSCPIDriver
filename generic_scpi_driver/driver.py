@@ -22,7 +22,7 @@ logger = logging.getLogger("GenericSCPI")
 from typing import Callable
 from typing import Optional
 
-_locks : dict[str,asyncio.Lock]= {}
+_locks: dict[str, asyncio.Lock] = {}
 _sessions = {}
 
 
@@ -37,7 +37,7 @@ def with_lock(f):
     @wraps(f)
     def wrapped(self: "GenericDriver", *args, **kw):
         lock = _locks[self.dev_id]
-        lock.acquire()
+        lock.acquire()  # FIXME this is broken - this is an async method
         try:
             return f(self, *args, **kw)
         finally:
