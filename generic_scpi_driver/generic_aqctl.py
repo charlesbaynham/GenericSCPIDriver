@@ -7,7 +7,12 @@ from sipyco.pc_rpc import Server
 
 
 def get_controller_func(
-    name, default_port, driver_class, driver_kwargs={}, extra_arg_processor=lambda _: [], allow_parallel=True
+    name,
+    default_port,
+    driver_class,
+    driver_kwargs={},
+    extra_arg_processor=lambda _: [],
+    allow_parallel=True,
 ):
     """
     Generate a function which will launch an ARTIQ controller for the provided class
