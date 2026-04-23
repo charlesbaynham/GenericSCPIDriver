@@ -4,6 +4,7 @@ import time
 
 import pyvisa
 from serial.tools.list_ports import grep as grep_serial_ports
+from serial.tools.list_ports import comports
 
 from .session import Session
 
@@ -26,6 +27,13 @@ def get_hwid_from_com_port(com_port):
     Returns:
         str: HWID of the device on the given COM port
     """
+    logger.debug("Getting HWID for COM port %s", com_port)
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(
+            f"Available COM ports: {[d.hwid for d in comports(include_links=True)]}"
+        )
+
     matches = list(grep_serial_ports(com_port))
     if not matches:
         raise RuntimeError("Device {} not found".format(com_port))
@@ -53,6 +61,13 @@ def get_com_port_by_hwid(hwid):
     Returns:
         str: current port of the device (e.g. "COM11")
     """
+    logger.debug("Getting COM port for HWID %s", hwid)
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(
+            f"Available COM ports: {[d.hwid for d in comports(include_links=True)]}"
+        )
+
     matches = list(grep_serial_ports(hwid))
     if not matches:
         raise RuntimeError("Device {} not found".format(hwid))
@@ -99,6 +114,7 @@ class VISASession(Session):
 
         :rtype: :class:pyvisa.resources.Resource
         """
+
         id_resolved = get_com_port_by_hwid(id)
 
         if id_resolved.lower() == id.lower():
