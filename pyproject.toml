@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "generic-scpi-driver"
-version = "1.8"
+version = "1.8.1"
 description = "A generic template for creating python object-based drivers for SCPI hardware devices which communicate via VISA. Compatible with ARTIQ  installed with [artiq] modifier"
 authors = ["Charles Baynham <charles.baynham@gmail.com>"]
 readme = "README.rst"
