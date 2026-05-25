@@ -82,7 +82,7 @@ This would allow you to call:
 Parameters can be validated by passing a custom function. This must accept a
 single parameter (of any type) and should return a string to be sent to the
 device, or throw an error. If you do not return a string, this library will
-attempt to cast your response to a string anyway. 
+attempt to cast your response to a string anyway.
 
 .. code-block:: python
 
