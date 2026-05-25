@@ -3,8 +3,8 @@ import re
 import time
 
 import pyvisa
-from serial.tools.list_ports import grep as grep_serial_ports
 from serial.tools.list_ports import comports
+from serial.tools.list_ports import grep as grep_serial_ports
 
 from .session import Session
 
